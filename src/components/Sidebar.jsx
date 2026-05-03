@@ -1,95 +1,89 @@
-import { MdDashboard, MdAssignment, MdPeople, MdAdd } from "react-icons/md";
 import { NavLink } from "react-router-dom";
+import { MdDashboard, MdAdd } from "react-icons/md";
+import { FaCoffee, FaUsers, FaClipboardList, FaMugHot } from "react-icons/fa";
+import { GiCoffeeBeans } from "react-icons/gi";
+import { TbReportMoney } from "react-icons/tb";
 
 export default function Sidebar() {
 
   const menuClass = ({ isActive }) =>
-    `flex items-center rounded-xl p-4 space-x-2
-     ${isActive
-       ? "text-green-600 bg-green-200 font-bold"
-       : "text-gray-600 hover:text-green-600 hover:bg-green-200 hover:font-bold"
+    `flex items-center rounded-xl p-4 space-x-3 transition
+     ${
+       isActive
+         ? "text-primary bg-soft font-semibold"
+         : "text-sub hover:text-primary hover:bg-soft"
      }`;
 
   return (
-    <div className="flex min-h-screen w-72 flex-col bg-white p-10 shadow-lg">
+    <div className="sticky top-0 h-screen w-72 flex flex-col bg-card p-8 border-r border-soft">
       
-      {/* Logo */}
-      <div className="flex flex-col">
-        <span className="text-[48px] text-gray-900 font-bold">
-          Sedap <b className="text-green-500">.</b>
+      {/* LOGO */}
+      <div>
+        <span className="text-[40px] font-bold text-primary">
+          El Coffee<span className="text-sub">.</span>
         </span>
-        <span className="font-semibold text-gray-400">
-          Modern Admin Dashboard
-        </span>
+        <p className="text-sub text-sm">
+          Coffee Shop Dashboard
+        </p>
       </div>
 
-      {/* Menu */}
-      <div className="mt-10">
-        <ul className="space-y-3">
+      {/* MENU */}
+      <ul className="mt-10 space-y-2">
 
-          <li>
-            <NavLink 
-              id="menu-1"
-              to="/" 
-              className={menuClass}
-            >
-              <MdDashboard className="mr-4 text-xl" />
-              <span>Dashboard</span>
-            </NavLink>
-          </li>
+        <li>
+          <NavLink to="/" className={menuClass}>
+            <MdDashboard />
+            Dashboard
+          </NavLink>
+        </li>
 
-          <li>
-            <NavLink 
-              id="menu-2"
-              to="/orders" 
-              className={menuClass}
-            >
-              <MdAssignment className="mr-4 text-xl" />
-              <span>Orders</span>
-            </NavLink>
-          </li>
+        <li>
+          <NavLink to="/orders" className={menuClass}>
+            <FaClipboardList />
+            Orders
+          </NavLink>
+        </li>
 
-          <li>
-            <NavLink 
-              id="menu-3"
-              to="/customers" 
-              className={menuClass}
-            >
-              <MdPeople className="mr-4 text-xl" />
-              <span>Customers</span>
-            </NavLink>
+        <li>
+          <NavLink to="/customers" className={menuClass}>
+            <FaUsers />
+            Customers
+          </NavLink>
+        </li>
 
-            <li>
-              <NavLink to="/400" className={menuClass}>
-                Delivery
-              </NavLink>
-            </li>
+        <li>
+          <NavLink to="/menu" className={menuClass}>
+            <FaCoffee />
+            Menu Items
+          </NavLink>
+        </li>
 
-            <li>
-              <NavLink to="/401" className={menuClass}>
-                Canceled
-              </NavLink>
-            </li>
+        <li>
+          <NavLink to="/inventory" className={menuClass}>
+            <GiCoffeeBeans />
+            Inventory
+          </NavLink>
+        </li>
 
-            <li>
-              <NavLink to="/403" className={menuClass}>
-                Income
-              </NavLink>
-            </li>
-          </li>
+        <li>
+          <NavLink to="/revenue" className={menuClass}>
+            <TbReportMoney />
+            Revenue
+          </NavLink>
+        </li>
 
-        </ul>
-      </div>
+      </ul>
 
-      {/* Footer */}
+      {/* FOOTER */}
       <div className="mt-auto">
-        <div className="bg-green-500 text-white p-4 rounded-md mb-10 flex items-center">
+        <div className="bg-primary text-white p-4 rounded-xl mb-10 flex items-center">
+          
           <div className="text-sm">
-            <span>Please organize your menus!</span>
+            <span>Manage your coffee menu ☕</span>
 
-            <div className="flex items-center mt-3 bg-white text-gray-600 p-2 rounded-md cursor-pointer">
+            <div className="flex items-center mt-3 bg-white text-primary p-2 rounded-md cursor-pointer">
               <MdAdd className="mr-2" />
-              Add Menus
+              Add Menu
             </div>
           </div>
 
@@ -99,8 +93,8 @@ export default function Sidebar() {
           />
         </div>
 
-        <span className="text-gray-400 text-sm block">
-          Sedap Restaurant Admin Dashboard
+        <span className="text-sub text-sm">
+          © Coffee Dashboard
         </span>
       </div>
 

@@ -4,6 +4,8 @@ import PageHeader from "../../components/PageHeader";
 
 export default function Customers() {
   const [customers, setCustomers] = useState(customersData);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
 
   const [form, setForm] = useState({
@@ -13,127 +15,95 @@ export default function Customers() {
     loyalty: "Bronze"
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const filtered = customers.filter((c) =>
+    c.customerName.toLowerCase().includes(search.toLowerCase()) &&
+    (filter === "" || c.loyalty === filter)
+  );
 
   const handleSubmit = () => {
     const newCustomer = {
-      customerId: `CUST-${1000 + customers.length + 1}`,
-      ...form
+      customerId: Date.now(),
+      ...form,
+      totalOrders: 0,
+      totalSpent: 0
     };
 
     setCustomers([...customers, newCustomer]);
     setShowForm(false);
-
-    setForm({
-      customerName: "",
-      email: "",
-      phone: "",
-      loyalty: "Bronze"
-    });
   };
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
-
+    <div className="flex-1 min-h-screen">
       <div className="p-5 space-y-5">
 
-        <PageHeader 
-          title="Customer" 
-          breadcrumb="Dashboard / Customer List"
+        <PageHeader
+          title="Customers"
+          breadcrumb="Dashboard / Customers"
         >
-          <button 
-            onClick={() => setShowForm(!showForm)}
-            className="bg-hijau text-white px-4 py-2 rounded-lg"
-          >
-            Add Customer
+          <button onClick={() => setShowForm(!showForm)} className="btn-coffee">
+            + Add Customer
           </button>
         </PageHeader>
 
         {/* FORM */}
         {showForm && (
-          <div className="bg-white p-5 rounded shadow space-y-3">
-
-            <input
-              name="customerName"
-              value={form.customerName}
-              onChange={handleChange}
-              placeholder="Customer Name"
-              className="border p-2 w-full"
-            />
-
-            <input
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="border p-2 w-full"
-            />
-
-            <input
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="Phone"
-              className="border p-2 w-full"
-            />
-
-            <select
-              name="loyalty"
-              value={form.loyalty}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            >
+          <div className="card-coffee space-y-3">
+            <input className="input-coffee" placeholder="Name"
+              onChange={(e) => setForm({...form, customerName: e.target.value})} />
+            <input className="input-coffee" placeholder="Email"
+              onChange={(e) => setForm({...form, email: e.target.value})} />
+            <input className="input-coffee" placeholder="Phone"
+              onChange={(e) => setForm({...form, phone: e.target.value})} />
+            <select className="input-coffee"
+              onChange={(e) => setForm({...form, loyalty: e.target.value})}>
               <option>Bronze</option>
               <option>Silver</option>
               <option>Gold</option>
             </select>
 
-            <button 
-              onClick={handleSubmit}
-              className="bg-hijau text-white px-4 py-2 rounded"
-            >
+            <button onClick={handleSubmit} className="btn-coffee">
               Submit
             </button>
-
           </div>
         )}
 
-        {/* TABLE */}
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
-          <table className="w-full text-left">
+        {/* SEARCH */}
+        <div className="flex gap-4">
+          <input placeholder="Search..." className="input-coffee"
+            onChange={(e) => setSearch(e.target.value)} />
+          <select className="input-coffee"
+            onChange={(e) => setFilter(e.target.value)}>
+            <option value="">All</option>
+            <option>Gold</option>
+            <option>Silver</option>
+            <option>Bronze</option>
+          </select>
+        </div>
 
-            <thead className="bg-gray-100 text-gray-600">
+        {/* TABLE */}
+        <div className="card-coffee overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-soft text-sub text-sm uppercase">
               <tr>
-                <th className="p-3">ID</th>
-                <th className="p-3">Name</th>
-                <th className="p-3">Email</th>
-                <th className="p-3">Phone</th>
-                <th className="p-3">Loyalty</th>
+                <th className="p-4 text-left">Customer</th>
+                <th className="p-4">Loyalty</th>
+                <th className="p-4 text-right">Orders</th>
+                <th className="p-4 text-right">Spent</th>
               </tr>
             </thead>
 
             <tbody>
-              {customers.map((c) => (
+              {filtered.map((c) => (
                 <tr key={c.customerId} className="border-t">
-                  <td className="p-3">{c.customerId}</td>
-                  <td className="p-3">{c.customerName}</td>
-                  <td className="p-3">{c.email}</td>
-                  <td className="p-3">{c.phone}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-1 rounded text-sm font-medium
-                      ${c.loyalty === "Gold" && "bg-yellow-100 text-yellow-600"}
-                      ${c.loyalty === "Silver" && "bg-gray-200 text-gray-600"}
-                      ${c.loyalty === "Bronze" && "bg-orange-100 text-orange-600"}
-                    `}>
-                      {c.loyalty}
-                    </span>
+                  <td className="p-4">{c.customerName}</td>
+                  <td className="p-4">{c.loyalty}</td>
+                  <td className="p-4 text-right">{c.totalOrders}</td>
+                  <td className="p-4 text-right text-primary">
+                    Rp {c.totalSpent.toLocaleString("id-ID")}
                   </td>
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
 

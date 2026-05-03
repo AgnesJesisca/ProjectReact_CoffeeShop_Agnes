@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ================= FONT ================= */
 @font-face {
     font-family: 'Barlow';
     src: url('/fonts/Barlow-Regular.ttf');
@@ -15,56 +16,125 @@
     src: url('/fonts/Inter-VariableFont_opsz,wght.ttf');
 }
 
+/* ================= THEME ================= */
 @theme {
-    /* Custom Fonts */
+    /* Fonts */
     --font-barlow: "Barlow", sans-serif;
     --font-poppins: "Poppins", sans-serif;
     --font-inter: "Inter", sans-serif;
 
-    /* Custom Colors */
-    --color-latar: #f3f4f6;
-    --color-teks: #374151; 
-    --color-teks-samping: #6b7280;
-    --color-garis: #e5e7eb; 
-    --color-hijau: #00B074;
-    --color-merah: #ef4444; 
-    --color-biru: #3b82f6;
-    --color-kuning: #f59e0b; 
-    --color-lime: #A0E644;
-    --color-abu: #6C717F;
+    /* ☕ COFFEE PALETTE */
+    --color-bg: #F7F3EF;
+    --color-card: #FFFFFF;
+
+    --color-primary: #6F4E37;     /* coffee */
+    --color-secondary: #C8A27C;   /* latte */
+    --color-soft: #F1E7DF;        /* cream */
+    --color-border: #EADFD7;
+
+    --color-text-main: #2D2D2D;
+    --color-text-sub: #8B6F5A;
 }
 
-
-
+/* ================= GLOBAL ================= */
 body {
-    @apply font-barlow bg-latar;
+    font-family: var(--font-barlow);
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
 }
 
+/* FULL WIDTH FIX */
 html, body, #root {
-  width: 100%;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* 🔥 MAP KE CLASS TAILWIND STYLE */
-.text-lime {
-  color: var(--color-lime);
+/* REMOVE LINK BLUE */
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
-.text-abu {
-  color: var(--color-abu);
+/* ================= UTILITY CLASS ================= */
+
+/* TEXT */
+.text-primary {
+    color: var(--color-primary);
 }
 
-.bg-hijau {
-  background-color: var(--color-hijau);
+.text-sub {
+    color: var(--color-text-sub);
 }
 
-.bg-lime {
-  background-color: var(--color-lime);
+.text-muted {
+    color: #9F9F9F;
 }
 
-:root {
-  --color-lime: #A0E644;
-  --color-abu: #6C717F;
+/* BACKGROUND */
+.bg-primary {
+    background-color: var(--color-primary);
+}
+
+.bg-soft {
+    background-color: var(--color-soft);
+}
+
+.bg-card {
+    background-color: var(--color-card);
+}
+
+/* BORDER */
+.border-soft {
+    border-color: var(--color-border);
+}
+
+/* BUTTON */
+.btn-coffee {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.btn-coffee:hover {
+    background-color: #5A3E2B;
+}
+
+/* CARD */
+.card-coffee {
+    background-color: white;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: 0.2s;
+}
+
+.card-coffee:hover {
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+}
+
+/* INPUT */
+.input-coffee {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+    outline: none;
+}
+
+.input-coffee:focus {
+    box-shadow: 0 0 0 2px var(--color-secondary);
+}
+
+/* TABLE */
+.table-header {
+    background-color: var(--color-bg);
+    color: var(--color-primary);
+}
+
+.table-row:hover {
+    background-color: #FAF6F2;
 }
