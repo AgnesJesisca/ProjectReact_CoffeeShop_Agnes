@@ -1,95 +1,379 @@
 [
   {
     "orderId": "ORD-1001",
-    "customer": "Andi",
-    "items": [
-      { "name": "Latte", "qty": 2, "price": 25000 },
-      { "name": "Croissant", "qty": 1, "price": 20000 }
-    ],
+    "customer": "Andi Saputra",
+    "customerPhone": "081234567001",
+    "items": [{ "name": "Caramel Latte", "qty": 1, "price": 30000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 5,
+    "barista": "Rina",
     "status": "Completed",
-    "date": "2026-05-01"
+    "date": "2026-05-10",
+    "notes": "Less sugar"
   },
   {
     "orderId": "ORD-1002",
-    "customer": "Budi",
-    "items": [
-      { "name": "Espresso", "qty": 1, "price": 20000 },
-      { "name": "Brownies", "qty": 2, "price": 18000 }
-    ],
+    "customer": "Budi Santoso",
+    "customerPhone": "081234567002",
+    "items": [{ "name": "Americano", "qty": 1, "price": 22000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Kevin",
     "status": "Completed",
-    "date": "2026-05-01"
+    "date": "2026-05-09",
+    "notes": "Extra hot"
   },
   {
     "orderId": "ORD-1003",
-    "customer": "Citra",
-    "items": [
-      { "name": "Americano", "qty": 2, "price": 22000 }
-    ],
+    "customer": "Citra Lestari",
+    "customerPhone": "081234567003",
+    "items": [{ "name": "Matcha Latte", "qty": 1, "price": 28000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 3,
+    "barista": "Nina",
     "status": "Completed",
-    "date": "2026-05-02"
+    "date": "2026-05-02",
+    "notes": "No ice"
   },
   {
     "orderId": "ORD-1004",
-    "customer": "Dewi",
-    "items": [
-      { "name": "Latte", "qty": 1, "price": 25000 },
-      { "name": "Cheesecake", "qty": 1, "price": 30000 }
-    ],
+    "customer": "Dewi Anggraini",
+    "customerPhone": "081234567004",
+    "items": [{ "name": "Vanilla Latte", "qty": 1, "price": 28000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 8,
+    "barista": "Adit",
     "status": "Completed",
-    "date": "2026-05-02"
+    "date": "2026-05-10",
+    "notes": "Extra creamy"
   },
   {
     "orderId": "ORD-1005",
-    "customer": "Eka",
-    "items": [
-      { "name": "Cappuccino", "qty": 2, "price": 24000 }
-    ],
+    "customer": "Eko Prasetyo",
+    "customerPhone": "081234567005",
+    "items": [{ "name": "Espresso", "qty": 1, "price": 20000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Rina",
     "status": "Completed",
-    "date": "2026-05-03"
+    "date": "2026-05-08",
+    "notes": "Normal sugar"
   },
   {
     "orderId": "ORD-1006",
-    "customer": "Fajar",
-    "items": [
-      { "name": "Matcha Latte", "qty": 1, "price": 28000 }
-    ],
+    "customer": "Fajar Nugroho",
+    "customerPhone": "081234567006",
+    "items": [{ "name": "Cappuccino", "qty": 1, "price": 25000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Kevin",
     "status": "Completed",
-    "date": "2026-05-03"
+    "date": "2026-05-03",
+    "notes": "Oat milk"
   },
   {
     "orderId": "ORD-1007",
-    "customer": "Gita",
-    "items": [
-      { "name": "Latte", "qty": 3, "price": 25000 }
-    ],
+    "customer": "Gita Putri",
+    "customerPhone": "081234567007",
+    "items": [{ "name": "Hazelnut Latte", "qty": 1, "price": 30000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 2,
+    "barista": "Nina",
     "status": "Completed",
-    "date": "2026-05-04"
+    "date": "2026-05-10",
+    "notes": "Strong coffee"
   },
   {
     "orderId": "ORD-1008",
-    "customer": "Hendra",
-    "items": [
-      { "name": "Espresso", "qty": 2, "price": 20000 }
-    ],
+    "customer": "Hendra Wijaya",
+    "customerPhone": "081234567008",
+    "items": [{ "name": "Mocha", "qty": 1, "price": 28000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Dine In",
+    "tableNumber": 4,
+    "barista": "Adit",
     "status": "Completed",
-    "date": "2026-05-04"
+    "date": "2026-05-04",
+    "notes": "No sugar"
   },
   {
     "orderId": "ORD-1009",
-    "customer": "Indah",
-    "items": [
-      { "name": "Mocha", "qty": 2, "price": 27000 }
-    ],
+    "customer": "Indah Sari",
+    "customerPhone": "081234567009",
+    "items": [{ "name": "Iced Latte", "qty": 1, "price": 25000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Rina",
     "status": "Completed",
-    "date": "2026-05-05"
+    "date": "2026-05-05",
+    "notes": "Less ice"
   },
   {
     "orderId": "ORD-1010",
-    "customer": "Joko",
-    "items": [
-      { "name": "Latte", "qty": 1, "price": 25000 }
-    ],
+    "customer": "Joko Susilo",
+    "customerPhone": "081234567010",
+    "items": [{ "name": "Flat White", "qty": 1, "price": 27000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Dine In",
+    "tableNumber": 6,
+    "barista": "Kevin",
     "status": "Completed",
-    "date": "2026-05-05"
+    "date": "2026-05-05",
+    "notes": "Hot"
+  },
+  {
+    "orderId": "ORD-1011",
+    "customer": "Kartika Sari",
+    "customerPhone": "081234567011",
+    "items": [{ "name": "Affogato", "qty": 1, "price": 30000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 1,
+    "barista": "Nina",
+    "status": "Completed",
+    "date": "2026-05-11",
+    "notes": "Extra ice cream"
+  },
+  {
+    "orderId": "ORD-1012",
+    "customer": "Lutfi Hakim",
+    "customerPhone": "081234567012",
+    "items": [{ "name": "Iced Lemon Tea", "qty": 1, "price": 18000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Dine In",
+    "tableNumber": 9,
+    "barista": "Adit",
+    "status": "Completed",
+    "date": "2026-05-01",
+    "notes": "More lemon"
+  },
+  {
+    "orderId": "ORD-1013",
+    "customer": "Maya Aprilia",
+    "customerPhone": "081234567013",
+    "items": [{ "name": "V60 Gayo", "qty": 1, "price": 35000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 10,
+    "barista": "Rina",
+    "status": "Completed",
+    "date": "2026-05-12",
+    "notes": "Manual brew"
+  },
+  {
+    "orderId": "ORD-1014",
+    "customer": "Nanda Putra",
+    "customerPhone": "081234567014",
+    "items": [{ "name": "Piccolo", "qty": 1, "price": 22000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Kevin",
+    "status": "Completed",
+    "date": "2026-05-10",
+    "notes": "Warm"
+  },
+  {
+    "orderId": "ORD-1015",
+    "customer": "Olivia Wijaya",
+    "customerPhone": "081234567015",
+    "items": [{ "name": "Avocado Coffee", "qty": 1, "price": 32000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 12,
+    "barista": "Nina",
+    "status": "Completed",
+    "date": "2026-05-12",
+    "notes": "Extra avocado"
+  },
+  {
+    "orderId": "ORD-1016",
+    "customer": "Panji Ramadhan",
+    "customerPhone": "081234567016",
+    "items": [{ "name": "Cold Brew", "qty": 1, "price": 25000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Adit",
+    "status": "Completed",
+    "date": "2026-05-02",
+    "notes": "No sugar"
+  },
+  {
+    "orderId": "ORD-1017",
+    "customer": "Qory Sandika",
+    "customerPhone": "081234567017",
+    "items": [{ "name": "Red Velvet Latte", "qty": 1, "price": 28000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 7,
+    "barista": "Rina",
+    "status": "Completed",
+    "date": "2026-05-09",
+    "notes": "Warm"
+  },
+  {
+    "orderId": "ORD-1018",
+    "customer": "Rian Hidayat",
+    "customerPhone": "081234567018",
+    "items": [{ "name": "Double Espresso", "qty": 1, "price": 25000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 4,
+    "barista": "Kevin",
+    "status": "Completed",
+    "date": "2026-05-12",
+    "notes": "Quick serve"
+  },
+  {
+    "orderId": "ORD-1019",
+    "customer": "Siska Putri",
+    "customerPhone": "081234567019",
+    "items": [{ "name": "Iced Lychee Tea", "qty": 1, "price": 24000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Nina",
+    "status": "Completed",
+    "date": "2026-05-06",
+    "notes": "Extra lychee"
+  },
+  {
+    "orderId": "ORD-1020",
+    "customer": "Taufik Ismail",
+    "customerPhone": "081234567020",
+    "items": [{ "name": "Long Black", "qty": 1, "price": 22000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 11,
+    "barista": "Adit",
+    "status": "Completed",
+    "date": "2026-05-11",
+    "notes": "Hot, no sugar"
+  },
+  {
+    "orderId": "ORD-1021",
+    "customer": "Ulysses Grant",
+    "customerPhone": "081234567021",
+    "items": [{ "name": "Dirty Chai Latte", "qty": 1, "price": 32000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 14,
+    "barista": "Rina",
+    "status": "Completed",
+    "date": "2026-05-12",
+    "notes": "Spicy"
+  },
+  {
+    "orderId": "ORD-1022",
+    "customer": "Viona Adelia",
+    "customerPhone": "081234567022",
+    "items": [{ "name": "Hot Chocolate", "qty": 1, "price": 25000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Dine In",
+    "tableNumber": 2,
+    "barista": "Kevin",
+    "status": "Completed",
+    "date": "2026-05-04",
+    "notes": "Marshmallow"
+  },
+  {
+    "orderId": "ORD-1024",
+    "customer": "Xena Arianti",
+    "customerPhone": "081234567024",
+    "items": [{ "name": "Irish Coffee", "qty": 1, "price": 35000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 5,
+    "barista": "Adit",
+    "status": "Completed",
+    "date": "2026-05-12",
+    "notes": "Creamy"
+  },
+  {
+    "orderId": "ORD-1025",
+    "customer": "Yusuf Mansur",
+    "customerPhone": "081234567025",
+    "items": [{ "name": "Tubruk Arabica", "qty": 1, "price": 15000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Dine In",
+    "tableNumber": 15,
+    "barista": "Rina",
+    "status": "Completed",
+    "date": "2026-05-05",
+    "notes": "Gula dikit"
+  },
+  {
+    "orderId": "ORD-1026",
+    "customer": "Zahra Amira",
+    "customerPhone": "081234567026",
+    "items": [{ "name": "Cafe Mocha", "qty": 1, "price": 28000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Kevin",
+    "status": "Completed",
+    "date": "2026-05-08",
+    "notes": "Extra chocolate"
+  },
+  {
+    "orderId": "ORD-1027",
+    "customer": "Abimanyu Putra",
+    "customerPhone": "081234567027",
+    "items": [{ "name": "Flat White", "qty": 1, "price": 27000 }],
+    "paymentMethod": "QRIS",
+    "orderType": "Dine In",
+    "tableNumber": 8,
+    "barista": "Nina",
+    "status": "Completed",
+    "date": "2026-05-11",
+    "notes": "Artistic"
+  },
+  {
+    "orderId": "ORD-1028",
+    "customer": "Bella Hadid",
+    "customerPhone": "081234567028",
+    "items": [{ "name": "Oatmilk Latte", "qty": 1, "price": 32000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 10,
+    "barista": "Adit",
+    "status": "Completed",
+    "date": "2026-05-10",
+    "notes": "Plant based"
+  },
+  {
+    "orderId": "ORD-1029",
+    "customer": "Chandra Wijaya",
+    "customerPhone": "081234567029",
+    "items": [{ "name": "Ice Coffee Gula Aren", "qty": 1, "price": 20000 }],
+    "paymentMethod": "Cash",
+    "orderType": "Take Away",
+    "tableNumber": 0,
+    "barista": "Rina",
+    "status": "Completed",
+    "date": "2026-05-09",
+    "notes": "Extra sweet"
+  },
+  {
+    "orderId": "ORD-1030",
+    "customer": "Dina Mariana",
+    "customerPhone": "081234567030",
+    "items": [{ "name": "Rose Latte", "qty": 1, "price": 30000 }],
+    "paymentMethod": "Debit",
+    "orderType": "Dine In",
+    "tableNumber": 1,
+    "barista": "Kevin",
+    "status": "Completed",
+    "date": "2026-05-12",
+    "notes": "Pink color"
   }
 ]

@@ -18,7 +18,8 @@ const Loading = React.lazy(() => import("./components/Loading"));
 const Menu = React.lazy(() => import("./pages/main/Menu"));
 const Inventory = React.lazy(() => import("./pages/main/Inventory"));
 const Revenue = React.lazy(() => import("./pages/main/Revenue"));
-
+const OrderDetail = React.lazy(() => import("./pages/main/OrderDetail"));
+const CustomerDetail = React.lazy(() => import("./pages/main/CustomerDetail"));
 
 
 function App() {
@@ -28,7 +29,9 @@ function App() {
       <Route element={<MainLayout />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/orders" element={<Orders />} />
+      <Route path="/orders/:id" element={<OrderDetail />} />
       <Route path="/customers" element={<Customers />} />
+      <Route path="/customers/:id" element={<CustomerDetail />} />
       <Route path="/menu" element={<Menu />} />
       <Route path="/inventory" element={<Inventory />} />
       <Route path="/revenue" element={<Revenue />} />
