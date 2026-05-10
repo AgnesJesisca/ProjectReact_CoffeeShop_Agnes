@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import orders from "../../data/orders.json";
 import PageHeader from "../../components/PageHeader";
+import ErrorPage from "./ErrorPage";
 
 export default function OrderDetail() {
 
@@ -18,31 +19,13 @@ export default function OrderDetail() {
     ) || 0;
 
   if (!order) {
-
-    return (
-
-      <div className="p-5">
-
-        <div className="card-coffee text-center">
-
-          <h2 className="text-2xl font-semibold text-primary">
-            Order Not Found
-          </h2>
-
-          <Link
-            to="/orders"
-            className="btn-coffee inline-block mt-5"
-          >
-            Back
-          </Link>
-
-        </div>
-
-      </div>
-
-    );
-
-  }
+  return (
+    <ErrorPage
+      code="404"
+      message="Order Not Found"
+    />
+  );
+}
 
   return (
 

@@ -1,17 +1,16 @@
-// src/pages/main/CustomerDetail.jsx
-
 import { useParams, Link } from "react-router-dom";
 
 import customers from "../../data/customers.json";
 import orders from "../../data/orders.json";
-
+import NotFound from "../main/ErrorPage";
 import PageHeader from "../../components/PageHeader";
+import ErrorPage from "./ErrorPage";
 
 export default function CustomerDetail() {
 
   const { id } = useParams();
 
-  // FIND CUSTOMER
+
   const customer = customers.find(
     (c) => c.customerId === id
   );
@@ -40,32 +39,14 @@ export default function CustomerDetail() {
     0
   );
 
-  if (!customer) {
-
-    return (
-
-      <div className="p-5">
-
-        <div className="card-coffee text-center">
-
-          <h2 className="text-2xl font-semibold text-primary">
-            Customer Not Found
-          </h2>
-
-          <Link
-            to="/customers"
-            className="btn-coffee inline-block mt-5"
-          >
-            Back
-          </Link>
-
-        </div>
-
-      </div>
-
-    );
-
-  }
+ if (!customer) {
+  return (
+    <ErrorPage
+      code="404"
+      message="Customer Not Found"
+    />
+  );
+}
 
   return (
 

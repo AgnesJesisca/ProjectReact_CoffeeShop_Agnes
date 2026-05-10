@@ -4,6 +4,7 @@ import customersData from "../../data/customers.json";
 import PageHeader from "../../components/PageHeader";
 import { FaEye } from "react-icons/fa";
 
+
 export default function Customers() {
   const [customers, setCustomers] = useState(customersData);
   const [search, setSearch] = useState("");

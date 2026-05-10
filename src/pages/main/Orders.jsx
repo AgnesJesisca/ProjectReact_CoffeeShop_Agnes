@@ -9,25 +9,15 @@ import menu from "../../data/menu.json";
 import PageHeader from "../../components/PageHeader";
 
 export default function Orders() {
-
   const [orders, setOrders] = useState(ordersData);
-
   const [showForm, setShowForm] = useState(false);
-
   const [selectedCustomer, setSelectedCustomer] = useState("");
-
   const [customerType, setCustomerType] = useState("Member");
-
   const [guestName, setGuestName] = useState("");
-
   const [cart, setCart] = useState([]);
-
   const [search, setSearch] = useState("");
-
   const [paymentMethod, setPaymentMethod] = useState("Cash");
-
   const [orderType, setOrderType] = useState("Dine In");
-
   const [notes, setNotes] = useState("");
 
   // ADD TO CART
@@ -85,9 +75,9 @@ export default function Orders() {
 
   // TOTAL
   const total = cart.reduce(
-    (a, b) => a + b.price * b.qty,
-    0
-  );
+  (a, b) => a + b.price,
+  0
+);
 
   // SUBMIT ORDER
   const handleSubmit = () => {
@@ -216,9 +206,7 @@ export default function Orders() {
                 className="input-coffee"
                 onChange={(e) =>
                   setSelectedCustomer(e.target.value)
-                }
-              >
-
+                }>
                 <option>
                   Select Customer
                 </option>
@@ -226,13 +214,10 @@ export default function Orders() {
                 {customers.map((c) => (
 
                   <option
-                    key={c.customerId}
-                  >
+                    key={c.customerId}>
                     {c.customerName}
                   </option>
-
                 ))}
-
               </select>
 
             ) : (
