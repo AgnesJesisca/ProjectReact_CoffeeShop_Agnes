@@ -1,113 +1,224 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import customersData from "../../data/customers.json";
-import PageHeader from "../../components/PageHeader";
-import { FaEye } from "react-icons/fa";
 
+import customersData from "../../data/customers.json";
+
+import PageHeader from "../../components/PageHeader";
+
+import {
+  Plus,
+  Search,
+  Eye,
+  Crown,
+  UserRound,
+} from "lucide-react";
 
 export default function Customers() {
-  const [customers, setCustomers] = useState(customersData);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("");
-  const [showForm, setShowForm] = useState(false);
 
-  const [form, setForm] = useState({
-    customerName: "",
-    email: "",
-    phone: "",
-    loyalty: "Bronze"
-  });
+  const [customers, setCustomers] =
+    useState(customersData);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [filter, setFilter] =
+    useState("");
+
+  const [showForm, setShowForm] =
+    useState(false);
+
+  const [form, setForm] =
+    useState({
+      customerName: "",
+      email: "",
+      phone: "",
+      loyalty: "Bronze",
+    });
 
   // FILTER
-  const filtered = customers.filter((c) =>
-    c.customerName.toLowerCase().includes(search.toLowerCase()) &&
-    (filter === "" || c.loyalty === filter)
+  const filtered = customers.filter(
+    (c) =>
+      c.customerName
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        ) &&
+      (filter === "" ||
+        c.loyalty === filter)
   );
 
   // SUBMIT
   const handleSubmit = () => {
+
     const newCustomer = {
-      customerId: "CUST-" + Date.now(),
+
+      customerId:
+        "CUST-" + Date.now(),
+
       ...form,
+
       totalOrders: 0,
-      totalSpent: 0
+
+      totalSpent: 0,
     };
 
-    setCustomers([newCustomer, ...customers]);
+    setCustomers([
+      newCustomer,
+      ...customers,
+    ]);
 
     setForm({
       customerName: "",
       email: "",
       phone: "",
-      loyalty: "Bronze"
+      loyalty: "Bronze",
     });
 
     setShowForm(false);
   };
 
   return (
-    <div className="flex-1 min-h-screen">
-      <div className="p-5 space-y-5">
+    <div className="flex-1 min-h-screen bg-[#F8F4EE]">
+
+      <div className="p-6 space-y-6">
 
         {/* HEADER */}
-        <PageHeader
-          title="Customers"
-          breadcrumb="Dashboard / Customers"
-        >
+        <div className="flex items-center justify-between">
+
+          <PageHeader
+            title="Customers Management"
+            breadcrumb="Manage coffee shop customers"
+          />
+
           <button
-            onClick={() => setShowForm(!showForm)}
-            className="btn-coffee"
+            onClick={() =>
+              setShowForm(!showForm)
+            }
+            className="
+            flex items-center gap-2
+            bg-gradient-to-r
+            from-[#D97706]
+            to-[#F59E0B]
+            hover:opacity-90
+            text-white
+            px-5 py-3
+            rounded-2xl
+            shadow-md
+            text-sm font-medium
+            transition-all
+            "
           >
-            + Add Customer
+            <Plus className="size-4" />
+            Add Customer
           </button>
-        </PageHeader>
+
+        </div>
 
         {/* FORM */}
         {showForm && (
-          <div className="card-coffee grid md:grid-cols-2 gap-4">
 
-            <input
-              className="input-coffee"
-              placeholder="Customer Name"
-              value={form.customerName}
-              onChange={(e) =>
-                setForm({ ...form, customerName: e.target.value })
-              }
-            />
+          <div
+            className="
+            bg-white
+            rounded-[28px]
+            border border-[#F1DFC8]
+            shadow-sm
+            p-6
+            "
+          >
 
-            <input
-              className="input-coffee"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) =>
-                setForm({ ...form, email: e.target.value })
-              }
-            />
-
-            <input
-              className="input-coffee"
-              placeholder="Phone"
-              value={form.phone}
-              onChange={(e) =>
-                setForm({ ...form, phone: e.target.value })
-              }
-            />
-
-            <select
-              className="input-coffee"
-              value={form.loyalty}
-              onChange={(e) =>
-                setForm({ ...form, loyalty: e.target.value })
-              }
+            <h2
+              className="
+              text-[20px]
+              font-semibold
+              text-[#5B2E0F]
+              mb-5
+              "
             >
-              <option>Bronze</option>
-              <option>Silver</option>
-              <option>Gold</option>
-            </select>
+              Add New Customer
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-4">
+
+              <input
+                className="input-coffee"
+                placeholder="Customer Name"
+                value={form.customerName}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    customerName:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className="input-coffee"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    email:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className="input-coffee"
+                placeholder="Phone Number"
+                value={form.phone}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    phone:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <select
+                className="input-coffee"
+                value={form.loyalty}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    loyalty:
+                      e.target.value,
+                  })
+                }
+              >
+                <option>
+                  Bronze
+                </option>
+
+                <option>
+                  Silver
+                </option>
+
+                <option>
+                  Gold
+                </option>
+
+              </select>
+
+            </div>
 
             <button
               onClick={handleSubmit}
-              className="btn-coffee md:col-span-2"
+              className="
+              mt-5
+              bg-[#8B4513]
+              hover:bg-[#6F3410]
+              text-white
+              px-5 py-3
+              rounded-xl
+              text-sm
+              font-medium
+              transition-all
+              "
             >
               Save Customer
             </button>
@@ -115,133 +226,260 @@ export default function Customers() {
           </div>
         )}
 
-        {/* SEARCH */}
+        {/* FILTER */}
         <div className="flex gap-4">
 
-          <input
-            placeholder="Search customer..."
-            className="input-coffee"
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="relative w-full max-w-sm">
+
+            <Search
+              className="
+              absolute
+              left-4 top-1/2
+              -translate-y-1/2
+              text-[#A16207]
+              size-4
+              "
+            />
+
+            <input
+              placeholder="Search customer..."
+              className="
+              input-coffee
+              pl-11
+              "
+              onChange={(e) =>
+                setSearch(
+                  e.target.value
+                )
+              }
+            />
+
+          </div>
 
           <select
-            className="input-coffee w-52"
-            onChange={(e) => setFilter(e.target.value)}
+            className="
+            input-coffee
+            w-[220px]
+            "
+            onChange={(e) =>
+              setFilter(
+                e.target.value
+              )
+            }
           >
-            <option value="">All Loyalty</option>
-            <option>Gold</option>
-            <option>Silver</option>
-            <option>Bronze</option>
+
+            <option value="">
+              All Loyalty
+            </option>
+
+            <option>
+              Gold
+            </option>
+
+            <option>
+              Silver
+            </option>
+
+            <option>
+              Bronze
+            </option>
+
           </select>
 
         </div>
 
-        {/* TABLE */}
-        <div className="card-coffee overflow-hidden">
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
 
-          <table className="w-full">
+          {filtered.map((c) => (
 
-            {/* HEAD */}
-            <thead className="bg-soft text-sub text-sm">
-              <tr>
-                <th className="p-4 text-left">Customer</th>
-                <th className="p-4 text-left">Loyalty</th>
-                <th className="p-4 text-center">Orders</th>
-                <th className="p-4 text-right">Spent</th>
-                <th className="p-4 text-center">Action</th>
-              </tr>
-            </thead>
+            <div
+              key={c.customerId}
+              className="
+              bg-white
+              rounded-[28px]
+              border border-[#F1DFC8]
+              shadow-sm
+              p-6
+              hover:-translate-y-1
+              hover:shadow-lg
+              transition-all duration-300
+              "
+            >
 
-            {/* BODY */}
-            <tbody>
+              {/* TOP */}
+              <div className="flex items-start justify-between">
 
-              {filtered.map((c) => (
+                <div className="flex items-center gap-4">
 
-                <tr
-                  key={c.customerId}
-                  className="border-t border-soft hover:bg-[#FAF6F2] transition"
+                  <div
+                    className="
+                    w-14 h-14
+                    rounded-2xl
+                    bg-[#FFF7ED]
+                    flex items-center justify-center
+                    "
+                  >
+
+                    <UserRound className="text-[#D97706] size-6" />
+
+                  </div>
+
+                  <div>
+
+                    <h2
+                      className="
+                      text-[20px]
+                      font-semibold
+                      text-[#5B2E0F]
+                      "
+                    >
+                      {c.customerName}
+                    </h2>
+
+                    <p
+                      className="
+                      text-sm
+                      text-[#A16207]
+                      mt-1
+                      "
+                    >
+                      {c.email}
+                    </p>
+
+                  </div>
+
+                </div>
+
+                {/* BADGE */}
+                <span
+                  className={`
+                  px-3 py-1
+                  rounded-full
+                  text-xs
+                  font-medium
+                  flex items-center gap-1
+
+                  ${
+                    c.loyalty ===
+                    "Gold"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : ""
+                  }
+
+                  ${
+                    c.loyalty ===
+                    "Silver"
+                      ? "bg-gray-200 text-gray-700"
+                      : ""
+                  }
+
+                  ${
+                    c.loyalty ===
+                    "Bronze"
+                      ? "bg-orange-100 text-orange-700"
+                      : ""
+                  }
+                `}
                 >
 
-                  {/* CUSTOMER */}
-                  <td className="p-4">
+                  <Crown className="size-3" />
 
-                    <div className="flex items-center gap-3">
+                  {c.loyalty}
 
-                      <div className="w-11 h-11 rounded-full bg-soft flex items-center justify-center text-primary font-semibold">
-                        {c.customerName.charAt(0)}
-                      </div>
+                </span>
 
-                      <div>
-                        <p className="font-medium">
-                          {c.customerName}
-                        </p>
+              </div>
 
-                        <p className="text-sm text-muted">
-                          {c.email}
-                        </p>
-                      </div>
+              {/* INFO */}
+              <div className="space-y-4 mt-7">
 
-                    </div>
+                <InfoBox
+                  label="Phone"
+                  value={c.phone}
+                />
 
-                  </td>
+                <InfoBox
+                  label="Total Orders"
+                  value={c.totalOrders}
+                />
 
-                  {/* LOYALTY */}
-                  <td className="p-4">
+                <InfoBox
+                  label="Total Spent"
+                  value={`Rp ${c.totalSpent.toLocaleString("id-ID")}`}
+                />
 
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium
-                      ${
-                        c.loyalty === "Gold" &&
-                        "bg-yellow-100 text-yellow-700"
-                      }
-                      ${
-                        c.loyalty === "Silver" &&
-                        "bg-gray-200 text-gray-700"
-                      }
-                      ${
-                        c.loyalty === "Bronze" &&
-                        "bg-orange-100 text-orange-700"
-                      }`}
-                    >
-                      {c.loyalty}
-                    </span>
+              </div>
 
-                  </td>
+              {/* ACTION */}
+              <Link
+                to={`/customers/${c.customerId}`}
+                className="
+                mt-6
+                flex items-center justify-center gap-2
+                border border-[#EADBC8]
+                hover:bg-[#FFF7ED]
+                py-3
+                rounded-2xl
+                text-[#6B4F3A]
+                text-sm
+                font-medium
+                transition-all
+                "
+              >
 
-                  {/* ORDERS */}
-                  <td className="p-4 text-center font-medium">
-                    {c.totalOrders}
-                  </td>
+                <Eye className="size-4" />
 
-                  {/* SPENT */}
-                  <td className="p-4 text-right font-semibold text-primary">
-                    Rp {c.totalSpent.toLocaleString("id-ID")}
-                  </td>
+                View Details
 
-                  {/* ACTION */}
-                  <td className="p-4 text-center">
+              </Link>
 
-                    <Link
-                      to={`/customers/${c.customerId}`}
-                      className="inline-flex items-center gap-2 bg-soft px-3 py-2 rounded-lg text-primary hover:bg-[#EADFD7] transition"
-                    >
-                      <FaEye />
-                      Detail
-                    </Link>
+            </div>
 
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
+          ))}
 
         </div>
 
       </div>
+
+    </div>
+  );
+}
+
+function InfoBox({
+  label,
+  value,
+}) {
+
+  return (
+    <div
+      className="
+      bg-[#FFF7ED]
+      border border-[#F4E1C8]
+      rounded-2xl
+      p-4
+      "
+    >
+
+      <p
+        className="
+        text-[#A16207]
+        text-sm
+        "
+      >
+        {label}
+      </p>
+
+      <h3
+        className="
+        text-[#5B2E0F]
+        font-semibold
+        mt-1
+        "
+      >
+        {value}
+      </h3>
+
     </div>
   );
 }

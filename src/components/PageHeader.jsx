@@ -1,13 +1,30 @@
-export default function PageHeader({ title, breadcrumb, children }) {
-  return (
-    <div className="card-coffee flex justify-between items-center w-full">
-      
-      <div>
-        <h1 className="text-2xl font-semibold text-primary">{title}</h1>
-        <p className="text-muted text-sm">{breadcrumb}</p>
-      </div>
+export default function PageHeader({
+  title,
+  breadcrumb,
+}) {
 
-      <div>{children}</div>
+  return (
+    <div className="mb-6">
+
+      <h2
+        className="
+        text-[20px]
+        font-bold
+        text-[#6B2400]
+        "
+      >
+        {title}
+      </h2>
+
+      <p
+        className="
+        text-[#E57A10]
+        text-[14px]
+        mt-1
+        "
+      >
+        {breadcrumb}
+      </p>
 
     </div>
   );

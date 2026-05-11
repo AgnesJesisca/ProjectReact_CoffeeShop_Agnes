@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaEye } from "react-icons/fa";
+
+import {
+  Plus,
+  Minus,
+  Trash2,
+  CreditCard,
+  Banknote,
+  QrCode,
+} from "lucide-react";
 
 import ordersData from "../../data/orders.json";
 import customers from "../../data/customers.json";
@@ -9,28 +17,47 @@ import menu from "../../data/menu.json";
 import PageHeader from "../../components/PageHeader";
 
 export default function Orders() {
+
   const [orders, setOrders] = useState(ordersData);
-  const [showForm, setShowForm] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [customerType, setCustomerType] = useState("Member");
-  const [guestName, setGuestName] = useState("");
+
   const [cart, setCart] = useState([]);
+
   const [search, setSearch] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Cash");
-  const [orderType, setOrderType] = useState("Dine In");
-  const [notes, setNotes] = useState("");
+
+  const [selectedCustomer, setSelectedCustomer] =
+    useState("");
+
+  const [customerType, setCustomerType] =
+    useState("Member");
+
+  const [guestName, setGuestName] =
+    useState("");
+
+  const [paymentMethod, setPaymentMethod] =
+    useState("Cash");
+
+  const [orderType, setOrderType] =
+    useState("Dine In");
+
+  const [notes, setNotes] =
+    useState("");
 
   // ADD TO CART
   const addToCart = (item) => {
 
-    const exist = cart.find((c) => c.name === item.name);
+    const exist = cart.find(
+      (c) => c.name === item.name
+    );
 
     if (exist) {
 
       setCart(
         cart.map((c) =>
           c.name === item.name
-            ? { ...c, qty: c.qty + 1 }
+            ? {
+                ...c,
+                qty: c.qty + 1,
+              }
             : c
         )
       );
@@ -41,63 +68,84 @@ export default function Orders() {
         ...cart,
         {
           ...item,
-          qty: 1
-        }
+          qty: 1,
+        },
       ]);
-
     }
   };
 
   // CHANGE QTY
-  const changeQty = (name, type) => {
+  const changeQty = (
+    name,
+    type
+  ) => {
 
     setCart(
-      cart.map((c) => {
+      cart
+        .map((c) => {
 
-        if (c.name === name) {
+          if (c.name === name) {
 
-          return {
-            ...c,
-            qty:
-              type === "inc"
-                ? c.qty + 1
-                : Math.max(1, c.qty - 1)
-          };
+            return {
+              ...c,
 
-        }
+              qty:
+                type === "inc"
+                  ? c.qty + 1
+                  : c.qty - 1,
+            };
+          }
 
-        return c;
+          return c;
+        })
 
-      })
+        .filter((c) => c.qty > 0)
     );
+  };
 
+  // REMOVE
+  const removeItem = (name) => {
+
+    setCart(
+      cart.filter(
+        (c) => c.name !== name
+      )
+    );
   };
 
   // TOTAL
   const total = cart.reduce(
-  (a, b) => a + b.price,
-  0
-);
+    (a, b) =>
+      a + b.qty * b.price,
+    0
+  );
 
-  // SUBMIT ORDER
+  // SUBMIT
   const handleSubmit = () => {
 
-    const selectedData = customers.find(
-      (c) => c.customerName === selectedCustomer
-    );
+    const selectedData =
+      customers.find(
+        (c) =>
+          c.customerName ===
+          selectedCustomer
+      );
 
     const newOrder = {
 
-      orderId: "ORD-" + Date.now(),
+      orderId:
+        "ORD-" + Date.now(),
 
       customer:
-        customerType === "Member"
+        customerType ===
+        "Member"
           ? selectedCustomer
           : guestName,
 
       customerPhone:
-        customerType === "Member"
-          ? selectedData?.phone || "-"
+        customerType ===
+        "Member"
+          ? selectedData?.phone ||
+            "-"
           : "-",
 
       customerType,
@@ -108,13 +156,6 @@ export default function Orders() {
 
       orderType,
 
-      tableNumber:
-        orderType === "Dine In"
-          ? Math.floor(Math.random() * 10) + 1
-          : 0,
-
-      barista: "Rina",
-
       total,
 
       status: "Pending",
@@ -123,11 +164,13 @@ export default function Orders() {
         .toISOString()
         .slice(0, 10),
 
-      notes
-
+      notes,
     };
 
-    setOrders([newOrder, ...orders]);
+    setOrders([
+      newOrder,
+      ...orders,
+    ]);
 
     setCart([]);
 
@@ -135,474 +178,765 @@ export default function Orders() {
 
     setGuestName("");
 
-    setPaymentMethod("Cash");
-
-    setOrderType("Dine In");
-
     setNotes("");
-
-    setShowForm(false);
-
   };
 
-  // FILTER
-  const filtered = orders.filter((o) =>
-    o.customer
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  // FILTER ORDER
+  const filteredOrders =
+    orders.filter((o) =>
+      o.customer
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        )
+    );
 
   return (
+    <div className="flex-1 min-h-screen bg-[#F8F4EE]">
 
-    <div className="flex-1 min-h-screen">
+      <div className="p-6 space-y-6">
 
-      <div className="p-5 space-y-5">
-
-        {/* HEADER */}
         <PageHeader
-          title="Orders"
-          breadcrumb="Dashboard / Orders"
-        >
+          title="Orders Management"
+          breadcrumb="Manage customer transactions"
+        />
 
-          <button
-            onClick={() =>
-              setShowForm(!showForm)
-            }
-            className="btn-coffee"
+        {/* TOP SECTION */}
+        <div className="grid lg:grid-cols-2 gap-6">
+
+          {/* LEFT */}
+          <div
+            className="
+            bg-white
+            rounded-[30px]
+            border border-[#F1DFC8]
+            shadow-sm
+            p-6
+            "
           >
-            + Add Order
-          </button>
 
-        </PageHeader>
+            <div className="flex items-center justify-between mb-6">
 
-        {/* FORM */}
-        {showForm && (
+              <div>
 
-          <div className="card-coffee space-y-5">
+                <h2
+                  className="
+                  text-[22px]
+                  font-semibold
+                  text-[#5B2E0F]
+                  "
+                >
+                  Create Order
+                </h2>
 
-            {/* CUSTOMER TYPE */}
-            <select
-              className="input-coffee"
-              value={customerType}
-              onChange={(e) =>
-                setCustomerType(e.target.value)
-              }
-            >
+                <p
+                  className="
+                  text-sm
+                  text-[#A16207]
+                  mt-1
+                  "
+                >
+                  Add customer transaction
+                </p>
 
-              <option>
-                Member
-              </option>
+              </div>
 
-              <option>
-                Guest
-              </option>
+            </div>
 
-            </select>
+            <div className="space-y-5">
 
-            {/* CUSTOMER */}
-            {customerType === "Member" ? (
-
+              {/* CUSTOMER */}
               <select
                 className="input-coffee"
+                value={customerType}
                 onChange={(e) =>
-                  setSelectedCustomer(e.target.value)
-                }>
+                  setCustomerType(
+                    e.target.value
+                  )
+                }
+              >
                 <option>
-                  Select Customer
+                  Member
                 </option>
 
-                {customers.map((c) => (
+                <option>
+                  Guest
+                </option>
 
-                  <option
-                    key={c.customerId}>
-                    {c.customerName}
-                  </option>
-                ))}
               </select>
 
-            ) : (
+              {customerType ===
+              "Member" ? (
 
-              <input
+                <select
+                  className="input-coffee"
+                  onChange={(e) =>
+                    setSelectedCustomer(
+                      e.target.value
+                    )
+                  }
+                >
+
+                  <option>
+                    Select Customer
+                  </option>
+
+                  {customers.map((c) => (
+
+                    <option
+                      key={
+                        c.customerId
+                      }
+                    >
+                      {
+                        c.customerName
+                      }
+                    </option>
+
+                  ))}
+
+                </select>
+
+              ) : (
+
+                <input
+                  className="input-coffee"
+                  placeholder="Guest Name"
+                  onChange={(e) =>
+                    setGuestName(
+                      e.target.value
+                    )
+                  }
+                />
+
+              )}
+
+              {/* MENU */}
+              <div>
+
+                <p
+                  className="
+                  text-sm
+                  font-medium
+                  text-[#6B4F3A]
+                  mb-3
+                  "
+                >
+                  Select Menu
+                </p>
+
+                <div className="grid grid-cols-2 gap-3">
+
+                  {menu.map((m) => (
+
+                    <button
+                      key={m.menuId}
+                      onClick={() =>
+                        addToCart(m)
+                      }
+                      className="
+                      border border-[#EADBC8]
+                      rounded-2xl
+                      p-4
+                      text-left
+                      hover:bg-[#FFF7ED]
+                      transition-all
+                      "
+                    >
+
+                      <p
+                        className="
+                        font-medium
+                        text-[#5B2E0F]
+                        "
+                      >
+                        {m.name}
+                      </p>
+
+                      <p
+                        className="
+                        text-sm
+                        text-[#A16207]
+                        mt-1
+                        "
+                      >
+                        Rp{" "}
+                        {m.price.toLocaleString(
+                          "id-ID"
+                        )}
+                      </p>
+
+                    </button>
+
+                  ))}
+
+                </div>
+
+              </div>
+
+              {/* OPTIONS */}
+              <div className="grid md:grid-cols-2 gap-4">
+
+                <select
+                  className="input-coffee"
+                  onChange={(e) =>
+                    setPaymentMethod(
+                      e.target.value
+                    )
+                  }
+                >
+                  <option>
+                    Cash
+                  </option>
+
+                  <option>
+                    QRIS
+                  </option>
+
+                  <option>
+                    Debit
+                  </option>
+
+                </select>
+
+                <select
+                  className="input-coffee"
+                  onChange={(e) =>
+                    setOrderType(
+                      e.target.value
+                    )
+                  }
+                >
+                  <option>
+                    Dine In
+                  </option>
+
+                  <option>
+                    Take Away
+                  </option>
+
+                </select>
+
+              </div>
+
+              {/* NOTES */}
+              <textarea
+                rows="3"
+                placeholder="Order notes..."
                 className="input-coffee"
-                placeholder="Guest Name"
                 onChange={(e) =>
-                  setGuestName(e.target.value)
+                  setNotes(
+                    e.target.value
+                  )
                 }
               />
-
-            )}
-
-            {/* MENU */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-              {menu.map((m) => (
-
-                <div
-                  key={m.menuId}
-                  className="border border-soft p-4 rounded-xl cursor-pointer hover:bg-soft transition"
-                  onClick={() => addToCart(m)}
-                >
-
-                  <p className="font-medium">
-                    {m.name}
-                  </p>
-
-                  <p className="text-sm text-muted">
-                    Rp{" "}
-                    {m.price.toLocaleString(
-                      "id-ID"
-                    )}
-                  </p>
-
-                </div>
-
-              ))}
-
-            </div>
-
-            {/* PAYMENT + TYPE */}
-            <div className="grid md:grid-cols-2 gap-4">
-
-              <select
-                className="input-coffee"
-                onChange={(e) =>
-                  setPaymentMethod(
-                    e.target.value
-                  )
-                }
-              >
-
-                <option>
-                  Cash
-                </option>
-
-                <option>
-                  QRIS
-                </option>
-
-                <option>
-                  Debit
-                </option>
-
-              </select>
-
-              <select
-                className="input-coffee"
-                onChange={(e) =>
-                  setOrderType(
-                    e.target.value
-                  )
-                }
-              >
-
-                <option>
-                  Dine In
-                </option>
-
-                <option>
-                  Take Away
-                </option>
-
-              </select>
-
-            </div>
-
-            {/* NOTES */}
-            <textarea
-              rows="3"
-              placeholder="Order notes..."
-              className="input-coffee"
-              onChange={(e) =>
-                setNotes(e.target.value)
-              }
-            />
-
-            {/* CART */}
-            <div className="space-y-3">
-
-              {cart.map((c) => (
-
-                <div
-                  key={c.name}
-                  className="flex justify-between items-center bg-soft p-3 rounded-xl"
-                >
-
-                  <div>
-
-                    <p className="font-medium">
-                      {c.name}
-                    </p>
-
-                    <p className="text-sm text-muted">
-                      Rp{" "}
-                      {c.price.toLocaleString(
-                        "id-ID"
-                      )}
-                    </p>
-
-                  </div>
-
-                  <div className="flex items-center gap-3">
-
-                    <button
-                      onClick={() =>
-                        changeQty(
-                          c.name,
-                          "dec"
-                        )
-                      }
-                      className="bg-white px-3 py-1 rounded"
-                    >
-                      -
-                    </button>
-
-                    <span>
-                      {c.qty}
-                    </span>
-
-                    <button
-                      onClick={() =>
-                        changeQty(
-                          c.name,
-                          "inc"
-                        )
-                      }
-                      className="bg-white px-3 py-1 rounded"
-                    >
-                      +
-                    </button>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-            {/* TOTAL */}
-            <div className="flex justify-between items-center">
-
-              <p className="text-lg font-semibold text-primary">
-
-                Total:
-                Rp{" "}
-                {total.toLocaleString(
-                  "id-ID"
-                )}
-
-              </p>
-
-              <button
-                onClick={handleSubmit}
-                className="btn-coffee"
-              >
-                Submit Order
-              </button>
 
             </div>
 
           </div>
 
-        )}
+          {/* RIGHT */}
+          <div
+            className="
+            bg-white
+            rounded-[30px]
+            border border-[#F1DFC8]
+            shadow-sm
+            p-6
+            "
+          >
 
-        {/* SEARCH */}
-        <input
-          placeholder="Search order..."
-          className="input-coffee"
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
+            <h2
+              className="
+              text-[22px]
+              font-semibold
+              text-[#5B2E0F]
+              "
+            >
+              Current Order
+            </h2>
 
-        {/* TABLE */}
-        <div className="card-coffee overflow-hidden">
+            <p
+              className="
+              text-sm
+              text-[#A16207]
+              mt-1 mb-6
+              "
+            >
+              Customer cart summary
+            </p>
 
-          <table className="w-full">
+            {/* CART */}
+            <div className="space-y-4 max-h-[420px] overflow-auto">
 
-            {/* HEAD */}
-            <thead className="bg-soft text-sub text-sm uppercase">
+              {cart.length === 0 ? (
 
-              <tr>
-
-                <th className="p-4 text-left">
-                  Customer
-                </th>
-
-                <th className="p-4 text-center">
-                  Type
-                </th>
-
-                <th className="p-4 text-left">
-                  Items
-                </th>
-
-                <th className="p-4 text-right">
-                  Total
-                </th>
-
-                <th className="p-4 text-center">
-                  Payment
-                </th>
-
-                <th className="p-4 text-center">
-                  Status
-                </th>
-
-                <th className="p-4 text-center">
-                  Barista
-                </th>
-
-                <th className="p-4 text-center">
-                  Date
-                </th>
-
-                <th className="p-4 text-center">
-                  Action
-                </th>
-
-              </tr>
-
-            </thead>
-
-            {/* BODY */}
-            <tbody>
-
-              {filtered.map((o) => (
-
-                <tr
-                  key={o.orderId}
-                  className="border-t border-soft hover:bg-[#FAF6F2] transition"
+                <div
+                  className="
+                  text-center
+                  text-[#A16207]
+                  py-12
+                  "
                 >
+                  No items added yet
+                </div>
 
-                  {/* CUSTOMER */}
-                  <td className="p-4">
+              ) : (
 
-                    <div>
+                cart.map((c) => (
 
-                      <p className="font-medium">
-                        {o.customer}
-                      </p>
+                  <div
+                    key={c.name}
+                    className="
+                    bg-[#FFF7ED]
+                    rounded-2xl
+                    p-4
+                    "
+                  >
 
-                      <p className="text-sm text-muted">
-                        {o.customerPhone}
-                      </p>
+                    <div className="flex justify-between items-start">
+
+                      <div>
+
+                        <h3
+                          className="
+                          font-semibold
+                          text-[#5B2E0F]
+                          "
+                        >
+                          {c.name}
+                        </h3>
+
+                        <p
+                          className="
+                          text-sm
+                          text-[#A16207]
+                          mt-1
+                          "
+                        >
+                          Rp{" "}
+                          {c.price.toLocaleString(
+                            "id-ID"
+                          )}
+                        </p>
+
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          removeItem(
+                            c.name
+                          )
+                        }
+                      >
+                        <Trash2 className="size-4 text-red-500" />
+                      </button>
 
                     </div>
 
-                  </td>
+                    {/* QTY */}
+                    <div className="flex items-center gap-3 mt-4">
 
-                  {/* TYPE */}
-                  <td className="p-4 text-center">
+                      <button
+                        onClick={() =>
+                          changeQty(
+                            c.name,
+                            "dec"
+                          )
+                        }
+                        className="
+                        w-9 h-9
+                        rounded-xl
+                        border border-[#EADBC8]
+                        flex items-center justify-center
+                        "
+                      >
+                        <Minus className="size-4" />
+                      </button>
 
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium
-                      ${
-                        o.customerType === "Member"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {o.customerType}
-                    </span>
+                      <span className="font-semibold">
+                        {c.qty}
+                      </span>
 
-                  </td>
+                      <button
+                        onClick={() =>
+                          changeQty(
+                            c.name,
+                            "inc"
+                          )
+                        }
+                        className="
+                        w-9 h-9
+                        rounded-xl
+                        border border-[#EADBC8]
+                        flex items-center justify-center
+                        "
+                      >
+                        <Plus className="size-4" />
+                      </button>
 
-                  {/* ITEMS */}
-                  <td className="p-4 text-sm">
+                    </div>
 
-                    {o.items
-                      .map(
-                        (i) =>
-                          `${i.name} x${i.qty}`
-                      )
-                      .join(", ")}
+                  </div>
+                ))
 
-                  </td>
+              )}
 
-                  {/* TOTAL */}
-                  <td className="p-4 text-right font-semibold text-primary">
+            </div>
 
-                    Rp{" "}
+            {/* TOTAL */}
+            <div
+              className="
+              border-t border-[#F5E7D4]
+              mt-6 pt-6
+              "
+            >
 
-                    {o.items
-                      .reduce(
-                        (a, b) =>
-                          a +
-                          b.qty * b.price,
-                        0
-                      )
-                      .toLocaleString(
-                        "id-ID"
-                      )}
+              <div className="flex justify-between items-center">
 
-                  </td>
+                <span
+                  className="
+                  text-[#6B4F3A]
+                  "
+                >
+                  Total
+                </span>
 
-                  {/* PAYMENT */}
-                  <td className="p-4 text-center">
-                    {o.paymentMethod}
-                  </td>
+                <h1
+                  className="
+                  text-[30px]
+                  font-bold
+                  text-[#5B2E0F]
+                  "
+                >
+                  Rp{" "}
+                  {total.toLocaleString(
+                    "id-ID"
+                  )}
+                </h1>
 
-                  {/* STATUS */}
-                  <td className="p-4 text-center">
+              </div>
 
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium
-                      ${
-                        o.status ===
-                          "Completed" &&
-                        "bg-green-100 text-green-600"
-                      }
-                      ${
-                        o.status ===
-                          "Pending" &&
-                        "bg-yellow-100 text-yellow-600"
-                      }`}
-                    >
-                      {o.status}
-                    </span>
+              {/* BUTTON */}
+              {/* BUTTON */}
+              <div className="space-y-3 mt-5">
 
-                  </td>
+                {/* CARD */}
+                <button
+                  onClick={() => {
+                    setPaymentMethod("Debit");
+                    handleSubmit();
+                  }}
+                  className="
+                  w-full
+                  flex items-center justify-center gap-2
+                  bg-gradient-to-r
+                  from-[#2563EB]
+                  to-[#06B6D4]
+                  text-white
+                  py-3
+                  rounded-2xl
+                  font-medium
+                  shadow-md
+                  hover:scale-[1.01]
+                  transition-all
+                  "
+                >
+                  <CreditCard className="size-5" />
+                  Pay with Card
+                </button>
 
-                  {/* BARISTA */}
-                  <td className="p-4 text-center">
-                    {o.barista}
-                  </td>
+                {/* QRIS */}
+                <button
+                  onClick={() => {
+                    setPaymentMethod("QRIS");
+                    handleSubmit();
+                  }}
+                  className="
+                  w-full
+                  flex items-center justify-center gap-2
+                  bg-gradient-to-r
+                  from-[#7C3AED]
+                  to-[#A855F7]
+                  text-white
+                  py-3
+                  rounded-2xl
+                  font-medium
+                  shadow-md
+                  hover:scale-[1.01]
+                  transition-all
+                  "
+                >
+                  <QrCode className="size-5" />
+                  Pay with QRIS
+                </button>
 
-                  {/* DATE */}
-                  <td className="p-4 text-center">
-                    {o.date}
-                  </td>
+                {/* CASH */}
+                <button
+                  onClick={() => {
+                    setPaymentMethod("Cash");
+                    handleSubmit();
+                  }}
+                  className="
+                  w-full
+                  flex items-center justify-center gap-2
+                  bg-gradient-to-r
+                  from-[#16A34A]
+                  to-[#10B981]
+                  text-white
+                  py-3
+                  rounded-2xl
+                  font-medium
+                  shadow-md
+                  hover:scale-[1.01]
+                  transition-all
+                  "
+                >
+                  <Banknote className="size-5" />
+                  Pay with Cash
+                </button>
 
-                  {/* ACTION */}
-                  <td className="p-4 text-center">
+              </div>
 
-                    <Link
-                      to={`/orders/${o.orderId}`}
-                      className="inline-flex items-center gap-2 bg-soft px-3 py-2 rounded-lg text-primary hover:bg-[#EADFD7] transition"
-                    >
+            </div>
 
-                      <FaEye />
+          </div>
 
-                      Detail
+        </div>
 
-                    </Link>
+        {/* HISTORY */}
+        <div
+          className="
+          bg-white
+          rounded-[30px]
+          border border-[#F1DFC8]
+          shadow-sm
+          overflow-hidden
+          "
+        >
 
-                  </td>
+          {/* TOP */}
+          <div className="p-6 border-b border-[#F5E7D4]">
+
+            <div className="flex items-center justify-between">
+
+              <div>
+
+                <h2
+                  className="
+                  text-[22px]
+                  font-semibold
+                  text-[#5B2E0F]
+                  "
+                >
+                  Order History
+                </h2>
+
+                <p
+                  className="
+                  text-sm
+                  text-[#A16207]
+                  mt-1
+                  "
+                >
+                  Recent customer orders
+                </p>
+
+              </div>
+
+              <input
+                placeholder="Search customer..."
+                className="
+                input-coffee
+                w-[260px]
+                "
+                onChange={(e) =>
+                  setSearch(
+                    e.target.value
+                  )
+                }
+              />
+
+            </div>
+
+          </div>
+
+          {/* TABLE */}
+          <div className="overflow-auto">
+
+            <table className="w-full">
+
+              <thead
+                className="
+                bg-[#FFF7ED]
+                text-[#A16207]
+                text-sm
+                "
+              >
+
+                <tr>
+
+                  <th className="p-5 text-left">
+                    Customer
+                  </th>
+
+                  <th className="p-5 text-left">
+                    Items
+                  </th>
+
+                  <th className="p-5 text-center">
+                    Payment
+                  </th>
+
+                  <th className="p-5 text-center">
+                    Status
+                  </th>
+
+                  <th className="p-5 text-right">
+                    Total
+                  </th>
+
+                  <th className="p-5 text-center">
+                    Action
+                  </th>
 
                 </tr>
 
-              ))}
+              </thead>
 
-            </tbody>
+              <tbody>
 
-          </table>
+                {filteredOrders.map((o) => (
+
+                  <tr
+                    key={o.orderId}
+                    className="
+                    border-t border-[#F5E7D4]
+                    hover:bg-[#FFFBF6]
+                    transition-all
+                    "
+                  >
+
+                    <td className="p-5">
+
+                      <div>
+
+                        <p
+                          className="
+                          font-semibold
+                          text-[#5B2E0F]
+                          "
+                        >
+                          {o.customer}
+                        </p>
+
+                        <p
+                          className="
+                          text-sm
+                          text-[#A16207]
+                          mt-1
+                          "
+                        >
+                          {o.date}
+                        </p>
+
+                      </div>
+
+                    </td>
+
+                    <td className="p-5 text-sm text-[#6B4F3A]">
+
+                      {o.items
+                        .map(
+                          (i) =>
+                            `${i.name} x${i.qty}`
+                        )
+                        .join(", ")}
+
+                    </td>
+
+                    <td className="p-5 text-center">
+                      {o.paymentMethod}
+                    </td>
+
+                    <td className="p-5 text-center">
+
+                      <span
+                        className={`
+                        px-3 py-1
+                        rounded-full
+                        text-xs
+                        font-medium
+
+                        ${
+                          o.status ===
+                          "Completed"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }
+                      `}
+                      >
+                        {o.status}
+                      </span>
+
+                    </td>
+
+                    <td
+                      className="
+                      p-5
+                      text-right
+                      font-semibold
+                      text-[#5B2E0F]
+                      "
+                    >
+                      Rp{" "}
+                      {(
+                        o.total ||
+                        o.items.reduce(
+                          (a, b) =>
+                            a +
+                            b.qty * b.price,
+                          0
+                        )
+                      ).toLocaleString(
+                        "id-ID"
+                      )}
+                    </td>
+
+                    <td className="p-5 text-center">
+
+                      <Link
+                        to={`/orders/${o.orderId}`}
+                        className="
+                        inline-flex items-center justify-center
+                        px-4 py-2
+                        rounded-xl
+                        border border-[#EADBC8]
+                        hover:bg-[#FFF7ED]
+                        text-sm
+                        text-[#6B4F3A]
+                        transition-all
+                        "
+                      >
+                        Detail
+                      </Link>
+
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         </div>
 
       </div>
 
     </div>
-
   );
 }
