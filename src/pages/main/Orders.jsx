@@ -12,35 +12,69 @@ import {
 
 import ordersData from "../../data/orders.json";
 import customers from "../../data/customers.json";
-import menu from "../../data/menu.json";
+import menuData from "../../data/menu.json";
 
 import PageHeader from "../../components/PageHeader";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import Card from "../../components/Card";
+import Badge from "../../components/Badge";
+import SearchBar from "../../components/SearchBar";
+import FilterSelect from "../../components/FilterSelect";
+import Table from "../../components/Table";
 
 export default function Orders() {
 
-  const [orders, setOrders] = useState(ordersData);
+  const [orders, setOrders] = useState(
+    ordersData.map((o) => ({
+      ...o,
+      total:
+        o.total ??
+        o.items.reduce(
+          (sum, item) =>
+            sum +
+            Number(item.qty || 0) *
+            Number(item.price || 0),
+          0
+        ),
+    }))
+  );
+
+  const [showForm, setShowForm] = useState(false);
 
   const [cart, setCart] = useState([]);
 
-  const [search, setSearch] = useState("");
+  const [searchOrder, setSearchOrder] = useState("");
+  const [searchMenu, setSearchMenu] = useState("");
+  const [category, setCategory] = useState("All");
 
-  const [selectedCustomer, setSelectedCustomer] =
-    useState("");
+  const [customerType, setCustomerType] = useState("Member");
 
-  const [customerType, setCustomerType] =
-    useState("Member");
+  const [selectedCustomer, setSelectedCustomer] = useState(
+    customers[0]?.customerName || ""
+  );
 
-  const [guestName, setGuestName] =
-    useState("");
+  const [guestName, setGuestName] = useState("");
 
-  const [paymentMethod, setPaymentMethod] =
-    useState("Cash");
+  const [orderType, setOrderType] = useState("Dine In");
 
-  const [orderType, setOrderType] =
-    useState("Dine In");
+  const [notes, setNotes] = useState("");
 
-  const [notes, setNotes] =
-    useState("");
+  // FILTER MENU
+  const filteredMenu = menuData.filter((m) => {
+
+    const matchSearch =
+      m.name.toLowerCase().includes(
+        searchMenu.toLowerCase()
+      );
+
+    const matchCategory =
+      category === "All"
+        ? true
+        : m.category === category;
+
+    return matchSearch && matchCategory;
+  });
 
   // ADD TO CART
   const addToCart = (item) => {
@@ -67,18 +101,16 @@ export default function Orders() {
       setCart([
         ...cart,
         {
-          ...item,
+          name: item.name,
           qty: 1,
+          price: Number(item.price),
         },
       ]);
     }
   };
 
   // CHANGE QTY
-  const changeQty = (
-    name,
-    type
-  ) => {
+  const changeQty = (name, type) => {
 
     setCart(
       cart
@@ -88,7 +120,6 @@ export default function Orders() {
 
             return {
               ...c,
-
               qty:
                 type === "inc"
                   ? c.qty + 1
@@ -103,7 +134,7 @@ export default function Orders() {
     );
   };
 
-  // REMOVE
+  // REMOVE ITEM
   const removeItem = (name) => {
 
     setCart(
@@ -115,84 +146,109 @@ export default function Orders() {
 
   // TOTAL
   const total = cart.reduce(
-    (a, b) =>
-      a + b.qty * b.price,
+    (sum, item) =>
+      sum +
+      Number(item.qty) *
+      Number(item.price),
     0
   );
 
-  // SUBMIT
-  const handleSubmit = () => {
+  // SUBMIT ORDER
+  const handleSubmit = (
+    paymentMethod
+  ) => {
 
-    const selectedData =
-      customers.find(
-        (c) =>
-          c.customerName ===
-          selectedCustomer
+    if (cart.length === 0) {
+
+      alert(
+        "Please add menu first"
       );
+
+      return;
+    }
+
+    const customerName =
+      customerType === "Member"
+        ? selectedCustomer
+        : guestName;
+
+    if (!customerName) {
+
+      alert(
+        "Please input customer"
+      );
+
+      return;
+    }
 
     const newOrder = {
 
       orderId:
-        "ORD-" + Date.now(),
+        "ORD-" +
+        Date.now(),
 
-      customer:
-        customerType ===
-        "Member"
-          ? selectedCustomer
-          : guestName,
+      customer: customerName,
 
       customerPhone:
-        customerType ===
-        "Member"
-          ? selectedData?.phone ||
-            "-"
-          : "-",
+        "08123456789",
 
-      customerType,
-
-      items: cart,
+      items: cart.map((i) => ({
+        name: i.name,
+        qty: Number(i.qty),
+        price: Number(i.price),
+      })),
 
       paymentMethod,
 
       orderType,
 
-      total,
+      tableNumber:
+        orderType === "Dine In"
+          ? Math.floor(
+              Math.random() * 20
+            ) + 1
+          : 0,
 
-      status: "Pending",
+      barista: "Admin",
+
+      status: "Completed",
 
       date: new Date()
         .toISOString()
         .slice(0, 10),
 
       notes,
+
+      total: Number(total),
     };
 
-    setOrders([
+    setOrders((prev) => [
       newOrder,
-      ...orders,
+      ...prev,
     ]);
 
     setCart([]);
-
-    setSelectedCustomer("");
-
     setGuestName("");
-
     setNotes("");
+    setShowForm(false);
+
+    alert(
+      "Order successfully added!"
+    );
   };
 
-  // FILTER ORDER
+  // FILTER HISTORY
   const filteredOrders =
     orders.filter((o) =>
       o.customer
         .toLowerCase()
         .includes(
-          search.toLowerCase()
+          searchOrder.toLowerCase()
         )
     );
 
   return (
-    <div className="flex-1 min-h-screen bg-[#F8F4EE]">
+    <div className="flex-1 min-h-screen bg-[#F8F4EE] overflow-x-hidden">
 
       <div className="p-6 space-y-6">
 
@@ -201,107 +257,82 @@ export default function Orders() {
           breadcrumb="Manage customer transactions"
         />
 
-        {/* TOP SECTION */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* BUTTON */}
+        <div className="flex justify-end">
 
-          {/* LEFT */}
-          <div
-            className="
-            bg-white
-            rounded-[30px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            "
+          <Button
+            onClick={() =>
+              setShowForm(
+                !showForm
+              )
+            }
           >
+            <Plus className="size-5" />
 
-            <div className="flex items-center justify-between mb-6">
+            {showForm
+              ? "Close Form"
+              : "Add Order"}
 
-              <div>
+          </Button>
 
-                <h2
-                  className="
-                  text-[22px]
-                  font-semibold
-                  text-[#5B2E0F]
-                  "
-                >
-                  Create Order
-                </h2>
+        </div>
 
-                <p
-                  className="
-                  text-sm
-                  text-[#A16207]
-                  mt-1
-                  "
-                >
-                  Add customer transaction
-                </p>
+        {/* FORM */}
+        {showForm && (
 
-              </div>
+          <Card className="space-y-6">
+
+            {/* TOP */}
+            <div>
+
+              <h2 className="text-[24px] font-semibold text-[#5B2E0F]">
+                Create New Order
+              </h2>
+
+              <p className="text-sm text-[#A16207] mt-1">
+                Add customer transaction
+              </p>
 
             </div>
 
-            <div className="space-y-5">
+            {/* CUSTOMER */}
+            <div className="grid md:grid-cols-2 gap-4">
 
-              {/* CUSTOMER */}
-              <select
-                className="input-coffee"
+              <FilterSelect
                 value={customerType}
+                options={[
+                  "Member",
+                  "Guest",
+                ]}
                 onChange={(e) =>
                   setCustomerType(
                     e.target.value
                   )
                 }
-              >
-                <option>
-                  Member
-                </option>
+              />
 
-                <option>
-                  Guest
-                </option>
+              {customerType === "Member" ? (
 
-              </select>
-
-              {customerType ===
-              "Member" ? (
-
-                <select
-                  className="input-coffee"
+                <FilterSelect
+                  value={
+                    selectedCustomer
+                  }
+                  options={customers.map(
+                    (c) =>
+                      c.customerName
+                  )}
                   onChange={(e) =>
                     setSelectedCustomer(
                       e.target.value
                     )
                   }
-                >
-
-                  <option>
-                    Select Customer
-                  </option>
-
-                  {customers.map((c) => (
-
-                    <option
-                      key={
-                        c.customerId
-                      }
-                    >
-                      {
-                        c.customerName
-                      }
-                    </option>
-
-                  ))}
-
-                </select>
+                />
 
               ) : (
 
-                <input
-                  className="input-coffee"
+                <Input
                   placeholder="Guest Name"
+                  value={guestName}
                   onChange={(e) =>
                     setGuestName(
                       e.target.value
@@ -311,119 +342,215 @@ export default function Orders() {
 
               )}
 
-              {/* MENU */}
-              <div>
+            </div>
 
-                <p
+            {/* SEARCH */}
+            <div className="grid md:grid-cols-2 gap-4">
+
+              <SearchBar
+                placeholder="Search menu..."
+                value={searchMenu}
+                onChange={(e) =>
+                  setSearchMenu(
+                    e.target.value
+                  )
+                }
+              />
+
+              <FilterSelect
+                value={category}
+                options={[
+                  "All",
+                  "Coffee",
+                  "Non-Coffee",
+                  "Snack",
+                ]}
+                onChange={(e) =>
+                  setCategory(
+                    e.target.value
+                  )
+                }
+              />
+
+            </div>
+
+            {/* MENU */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+              {filteredMenu.map((m) => (
+
+                <Card
+                  key={m.menuId}
                   className="
-                  text-sm
-                  font-medium
-                  text-[#6B4F3A]
-                  mb-3
+                  cursor-pointer
+                  hover:bg-[#FFF7ED]
+                  transition-all
+                  p-4
                   "
+                  onClick={() =>
+                    addToCart(m)
+                  }
                 >
-                  Select Menu
-                </p>
 
-                <div className="grid grid-cols-2 gap-3">
+                  <h3 className="font-semibold text-[#5B2E0F]">
+                    {m.name}
+                  </h3>
 
-                  {menu.map((m) => (
+                  <p className="text-sm text-[#A16207] mt-1">
+                    {m.category}
+                  </p>
 
-                    <button
-                      key={m.menuId}
-                      onClick={() =>
-                        addToCart(m)
-                      }
+                  <p className="font-bold text-[#D97706] mt-3">
+                    Rp{" "}
+                    {Number(
+                      m.price
+                    ).toLocaleString(
+                      "id-ID"
+                    )}
+                  </p>
+
+                </Card>
+
+              ))}
+
+            </div>
+
+            {/* CART */}
+            <div className="border-t border-[#F5E7D4] pt-6">
+
+              <h3 className="text-[20px] font-semibold text-[#5B2E0F] mb-5">
+                Current Order
+              </h3>
+
+              {cart.length === 0 ? (
+
+                <div className="text-center py-10 text-[#A16207]">
+                  No items added yet
+                </div>
+
+              ) : (
+
+                <div className="space-y-4">
+
+                  {cart.map((c) => (
+
+                    <div
+                      key={c.name}
                       className="
-                      border border-[#EADBC8]
+                      border border-[#F5E7D4]
                       rounded-2xl
                       p-4
-                      text-left
-                      hover:bg-[#FFF7ED]
-                      transition-all
+                      bg-[#FFF7ED]
                       "
                     >
 
-                      <p
-                        className="
-                        font-medium
-                        text-[#5B2E0F]
-                        "
-                      >
-                        {m.name}
-                      </p>
+                      <div className="flex justify-between items-start">
 
-                      <p
-                        className="
-                        text-sm
-                        text-[#A16207]
-                        mt-1
-                        "
-                      >
-                        Rp{" "}
-                        {m.price.toLocaleString(
-                          "id-ID"
-                        )}
-                      </p>
+                        <div>
 
-                    </button>
+                          <h3 className="font-semibold text-[#5B2E0F]">
+                            {c.name}
+                          </h3>
+
+                          <p className="text-sm text-[#A16207] mt-1">
+                            Rp{" "}
+                            {Number(
+                              c.price
+                            ).toLocaleString(
+                              "id-ID"
+                            )} x {c.qty}
+                          </p>
+
+                          <p className="font-semibold text-[#D97706] mt-2">
+                            Rp{" "}
+                            {(
+                              Number(c.price) *
+                              Number(c.qty)
+                            ).toLocaleString(
+                              "id-ID"
+                            )}
+                          </p>
+
+                        </div>
+
+                        <Button
+                          variant="danger"
+                          className="w-10 h-10 px-0"
+                          onClick={() =>
+                            removeItem(
+                              c.name
+                            )
+                          }
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+
+                      </div>
+
+                      {/* QTY */}
+                      <div className="flex items-center gap-3 mt-4">
+
+                        <Button
+                          variant="outline"
+                          className="w-9 h-9 px-0"
+                          onClick={() =>
+                            changeQty(
+                              c.name,
+                              "dec"
+                            )
+                          }
+                        >
+                          <Minus className="size-4" />
+                        </Button>
+
+                        <span className="font-semibold min-w-[24px] text-center">
+                          {c.qty}
+                        </span>
+
+                        <Button
+                          variant="outline"
+                          className="w-9 h-9 px-0"
+                          onClick={() =>
+                            changeQty(
+                              c.name,
+                              "inc"
+                            )
+                          }
+                        >
+                          <Plus className="size-4" />
+                        </Button>
+
+                      </div>
+
+                    </div>
 
                   ))}
 
                 </div>
 
-              </div>
+              )}
 
-              {/* OPTIONS */}
-              <div className="grid md:grid-cols-2 gap-4">
+            </div>
 
-                <select
-                  className="input-coffee"
-                  onChange={(e) =>
-                    setPaymentMethod(
-                      e.target.value
-                    )
-                  }
-                >
-                  <option>
-                    Cash
-                  </option>
+            {/* OPTIONS */}
+            <div className="grid md:grid-cols-2 gap-4">
 
-                  <option>
-                    QRIS
-                  </option>
+              <FilterSelect
+                value={orderType}
+                options={[
+                  "Dine In",
+                  "Take Away",
+                ]}
+                onChange={(e) =>
+                  setOrderType(
+                    e.target.value
+                  )
+                }
+              />
 
-                  <option>
-                    Debit
-                  </option>
-
-                </select>
-
-                <select
-                  className="input-coffee"
-                  onChange={(e) =>
-                    setOrderType(
-                      e.target.value
-                    )
-                  }
-                >
-                  <option>
-                    Dine In
-                  </option>
-
-                  <option>
-                    Take Away
-                  </option>
-
-                </select>
-
-              </div>
-
-              {/* NOTES */}
-              <textarea
-                rows="3"
-                placeholder="Order notes..."
-                className="input-coffee"
+              <Input
+                placeholder="Notes..."
+                value={notes}
                 onChange={(e) =>
                   setNotes(
                     e.target.value
@@ -433,325 +560,96 @@ export default function Orders() {
 
             </div>
 
-          </div>
-
-          {/* RIGHT */}
-          <div
-            className="
-            bg-white
-            rounded-[30px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            "
-          >
-
-            <h2
-              className="
-              text-[22px]
-              font-semibold
-              text-[#5B2E0F]
-              "
-            >
-              Current Order
-            </h2>
-
-            <p
-              className="
-              text-sm
-              text-[#A16207]
-              mt-1 mb-6
-              "
-            >
-              Customer cart summary
-            </p>
-
-            {/* CART */}
-            <div className="space-y-4 max-h-[420px] overflow-auto">
-
-              {cart.length === 0 ? (
-
-                <div
-                  className="
-                  text-center
-                  text-[#A16207]
-                  py-12
-                  "
-                >
-                  No items added yet
-                </div>
-
-              ) : (
-
-                cart.map((c) => (
-
-                  <div
-                    key={c.name}
-                    className="
-                    bg-[#FFF7ED]
-                    rounded-2xl
-                    p-4
-                    "
-                  >
-
-                    <div className="flex justify-between items-start">
-
-                      <div>
-
-                        <h3
-                          className="
-                          font-semibold
-                          text-[#5B2E0F]
-                          "
-                        >
-                          {c.name}
-                        </h3>
-
-                        <p
-                          className="
-                          text-sm
-                          text-[#A16207]
-                          mt-1
-                          "
-                        >
-                          Rp{" "}
-                          {c.price.toLocaleString(
-                            "id-ID"
-                          )}
-                        </p>
-
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          removeItem(
-                            c.name
-                          )
-                        }
-                      >
-                        <Trash2 className="size-4 text-red-500" />
-                      </button>
-
-                    </div>
-
-                    {/* QTY */}
-                    <div className="flex items-center gap-3 mt-4">
-
-                      <button
-                        onClick={() =>
-                          changeQty(
-                            c.name,
-                            "dec"
-                          )
-                        }
-                        className="
-                        w-9 h-9
-                        rounded-xl
-                        border border-[#EADBC8]
-                        flex items-center justify-center
-                        "
-                      >
-                        <Minus className="size-4" />
-                      </button>
-
-                      <span className="font-semibold">
-                        {c.qty}
-                      </span>
-
-                      <button
-                        onClick={() =>
-                          changeQty(
-                            c.name,
-                            "inc"
-                          )
-                        }
-                        className="
-                        w-9 h-9
-                        rounded-xl
-                        border border-[#EADBC8]
-                        flex items-center justify-center
-                        "
-                      >
-                        <Plus className="size-4" />
-                      </button>
-
-                    </div>
-
-                  </div>
-                ))
-
-              )}
-
-            </div>
-
             {/* TOTAL */}
-            <div
-              className="
-              border-t border-[#F5E7D4]
-              mt-6 pt-6
-              "
-            >
+            <div className="border-t border-[#F5E7D4] pt-6">
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-5">
 
-                <span
-                  className="
-                  text-[#6B4F3A]
-                  "
-                >
+                <span className="text-[#6B4F3A]">
                   Total
                 </span>
 
-                <h1
-                  className="
-                  text-[30px]
-                  font-bold
-                  text-[#5B2E0F]
-                  "
-                >
+                <h1 className="text-[34px] font-bold text-[#5B2E0F]">
                   Rp{" "}
-                  {total.toLocaleString(
+                  {Number(total).toLocaleString(
                     "id-ID"
                   )}
                 </h1>
 
               </div>
 
-              {/* BUTTON */}
-              {/* BUTTON */}
-              <div className="space-y-3 mt-5">
+              {/* PAYMENT */}
+              <div className="grid md:grid-cols-3 gap-4">
 
-                {/* CARD */}
-                <button
-                  onClick={() => {
-                    setPaymentMethod("Debit");
-                    handleSubmit();
-                  }}
-                  className="
-                  w-full
-                  flex items-center justify-center gap-2
-                  bg-gradient-to-r
-                  from-[#2563EB]
-                  to-[#06B6D4]
-                  text-white
-                  py-3
-                  rounded-2xl
-                  font-medium
-                  shadow-md
-                  hover:scale-[1.01]
-                  transition-all
-                  "
+                <Button
+                  variant="debit"
+                  onClick={() =>
+                    handleSubmit(
+                      "Debit"
+                    )
+                  }
                 >
                   <CreditCard className="size-5" />
-                  Pay with Card
-                </button>
+                  Card
+                </Button>
 
-                {/* QRIS */}
-                <button
-                  onClick={() => {
-                    setPaymentMethod("QRIS");
-                    handleSubmit();
-                  }}
-                  className="
-                  w-full
-                  flex items-center justify-center gap-2
-                  bg-gradient-to-r
-                  from-[#7C3AED]
-                  to-[#A855F7]
-                  text-white
-                  py-3
-                  rounded-2xl
-                  font-medium
-                  shadow-md
-                  hover:scale-[1.01]
-                  transition-all
-                  "
+                <Button
+                  variant="qris"
+                  onClick={() =>
+                    handleSubmit(
+                      "QRIS"
+                    )
+                  }
                 >
                   <QrCode className="size-5" />
-                  Pay with QRIS
-                </button>
+                  QRIS
+                </Button>
 
-                {/* CASH */}
-                <button
-                  onClick={() => {
-                    setPaymentMethod("Cash");
-                    handleSubmit();
-                  }}
-                  className="
-                  w-full
-                  flex items-center justify-center gap-2
-                  bg-gradient-to-r
-                  from-[#16A34A]
-                  to-[#10B981]
-                  text-white
-                  py-3
-                  rounded-2xl
-                  font-medium
-                  shadow-md
-                  hover:scale-[1.01]
-                  transition-all
-                  "
+                <Button
+                  variant="cash"
+                  onClick={() =>
+                    handleSubmit(
+                      "Cash"
+                    )
+                  }
                 >
                   <Banknote className="size-5" />
-                  Pay with Cash
-                </button>
+                  Cash
+                </Button>
 
               </div>
 
             </div>
 
-          </div>
+          </Card>
 
-        </div>
+        )}
 
         {/* HISTORY */}
-        <div
-          className="
-          bg-white
-          rounded-[30px]
-          border border-[#F1DFC8]
-          shadow-sm
-          overflow-hidden
-          "
-        >
+        <Card className="overflow-hidden p-0">
 
-          {/* TOP */}
           <div className="p-6 border-b border-[#F5E7D4]">
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
               <div>
 
-                <h2
-                  className="
-                  text-[22px]
-                  font-semibold
-                  text-[#5B2E0F]
-                  "
-                >
+                <h2 className="text-[22px] font-semibold text-[#5B2E0F]">
                   Order History
                 </h2>
 
-                <p
-                  className="
-                  text-sm
-                  text-[#A16207]
-                  mt-1
-                  "
-                >
+                <p className="text-sm text-[#A16207] mt-1">
                   Recent customer orders
                 </p>
 
               </div>
 
-              <input
+              <SearchBar
                 placeholder="Search customer..."
-                className="
-                input-coffee
-                w-[260px]
-                "
+                className="w-full md:w-[260px]"
+                value={searchOrder}
                 onChange={(e) =>
-                  setSearch(
+                  setSearchOrder(
                     e.target.value
                   )
                 }
@@ -762,178 +660,102 @@ export default function Orders() {
           </div>
 
           {/* TABLE */}
-          <div className="overflow-auto">
+          <div className="overflow-x-auto">
 
-            <table className="w-full">
+            <Table
+              headers={[
+                "Customer",
+                "Items",
+                "Payment",
+                "Status",
+                "Total",
+                "Action",
+              ]}
+            >
 
-              <thead
-                className="
-                bg-[#FFF7ED]
-                text-[#A16207]
-                text-sm
-                "
-              >
+              {filteredOrders.map((o) => (
 
-                <tr>
+                <tr
+                  key={o.orderId}
+                  className="
+                  border-t border-[#F5E7D4]
+                  hover:bg-[#FFFBF6]
+                  transition-all
+                  "
+                >
 
-                  <th className="p-5 text-left">
-                    Customer
-                  </th>
+                  <td className="p-5">
 
-                  <th className="p-5 text-left">
-                    Items
-                  </th>
+                    <p className="font-semibold text-[#5B2E0F]">
+                      {o.customer}
+                    </p>
 
-                  <th className="p-5 text-center">
-                    Payment
-                  </th>
+                    <p className="text-sm text-[#A16207] mt-1">
+                      {o.date}
+                    </p>
 
-                  <th className="p-5 text-center">
-                    Status
-                  </th>
+                  </td>
 
-                  <th className="p-5 text-right">
-                    Total
-                  </th>
+                  <td className="p-5 text-sm text-[#6B4F3A]">
 
-                  <th className="p-5 text-center">
-                    Action
-                  </th>
+                    {o.items
+                      .map(
+                        (i) =>
+                          `${i.name} x${i.qty}`
+                      )
+                      .join(", ")}
+
+                  </td>
+
+                  <td className="p-5 text-center">
+                    {o.paymentMethod}
+                  </td>
+
+                  <td className="p-5 text-center">
+
+                    <Badge color="green">
+                      {o.status}
+                    </Badge>
+
+                  </td>
+
+                  <td className="p-5 text-right font-semibold text-[#5B2E0F]">
+
+                    Rp{" "}
+                    {Number(
+                      o.total
+                    ).toLocaleString(
+                      "id-ID"
+                    )}
+
+                  </td>
+
+                  <td className="p-5 text-center">
+
+                    <Link
+                      to={`/orders/${o.orderId}`}
+                    >
+
+                      <Button
+                        variant="outline"
+                        className="h-[40px]"
+                      >
+                        Detail
+                      </Button>
+
+                    </Link>
+
+                  </td>
 
                 </tr>
 
-              </thead>
+              ))}
 
-              <tbody>
-
-                {filteredOrders.map((o) => (
-
-                  <tr
-                    key={o.orderId}
-                    className="
-                    border-t border-[#F5E7D4]
-                    hover:bg-[#FFFBF6]
-                    transition-all
-                    "
-                  >
-
-                    <td className="p-5">
-
-                      <div>
-
-                        <p
-                          className="
-                          font-semibold
-                          text-[#5B2E0F]
-                          "
-                        >
-                          {o.customer}
-                        </p>
-
-                        <p
-                          className="
-                          text-sm
-                          text-[#A16207]
-                          mt-1
-                          "
-                        >
-                          {o.date}
-                        </p>
-
-                      </div>
-
-                    </td>
-
-                    <td className="p-5 text-sm text-[#6B4F3A]">
-
-                      {o.items
-                        .map(
-                          (i) =>
-                            `${i.name} x${i.qty}`
-                        )
-                        .join(", ")}
-
-                    </td>
-
-                    <td className="p-5 text-center">
-                      {o.paymentMethod}
-                    </td>
-
-                    <td className="p-5 text-center">
-
-                      <span
-                        className={`
-                        px-3 py-1
-                        rounded-full
-                        text-xs
-                        font-medium
-
-                        ${
-                          o.status ===
-                          "Completed"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }
-                      `}
-                      >
-                        {o.status}
-                      </span>
-
-                    </td>
-
-                    <td
-                      className="
-                      p-5
-                      text-right
-                      font-semibold
-                      text-[#5B2E0F]
-                      "
-                    >
-                      Rp{" "}
-                      {(
-                        o.total ||
-                        o.items.reduce(
-                          (a, b) =>
-                            a +
-                            b.qty * b.price,
-                          0
-                        )
-                      ).toLocaleString(
-                        "id-ID"
-                      )}
-                    </td>
-
-                    <td className="p-5 text-center">
-
-                      <Link
-                        to={`/orders/${o.orderId}`}
-                        className="
-                        inline-flex items-center justify-center
-                        px-4 py-2
-                        rounded-xl
-                        border border-[#EADBC8]
-                        hover:bg-[#FFF7ED]
-                        text-sm
-                        text-[#6B4F3A]
-                        transition-all
-                        "
-                      >
-                        Detail
-                      </Link>
-
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
+            </Table>
 
           </div>
 
-        </div>
+        </Card>
 
       </div>
 

@@ -3,6 +3,12 @@ import { useState } from "react";
 import data from "../../data/inventory.json";
 
 import PageHeader from "../../components/PageHeader";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import Card from "../../components/Card";
+import Badge from "../../components/Badge";
+import SearchBar from "../../components/SearchBar";
+import Modal from "../../components/Modal";
 
 import {
   Plus,
@@ -13,9 +19,7 @@ import {
 export default function Inventory() {
 
   const [items, setItems] = useState(data);
-
   const [search, setSearch] = useState("");
-
   const [showForm, setShowForm] = useState(false);
 
   const [newItem, setNewItem] = useState({
@@ -26,7 +30,6 @@ export default function Inventory() {
   });
 
   const [selected, setSelected] = useState(null);
-
   const [qty, setQty] = useState(0);
 
   const filtered = items.filter((i) =>
@@ -35,7 +38,6 @@ export default function Inventory() {
     )
   );
 
-  // LOW STOCK
   const lowStockItems = items.filter(
     (i) => i.stock < 5
   );
@@ -45,7 +47,6 @@ export default function Inventory() {
 
     setItems([
       ...items,
-
       {
         ...newItem,
         itemId: Date.now(),
@@ -83,12 +84,10 @@ export default function Inventory() {
 
           return {
             ...item,
-
             stock:
               newStock < 0
                 ? 0
                 : newStock,
-
             status:
               newStock < 5
                 ? "Low"
@@ -101,7 +100,6 @@ export default function Inventory() {
     );
 
     setSelected(null);
-
     setQty(0);
   };
 
@@ -118,43 +116,22 @@ export default function Inventory() {
             breadcrumb="Track and manage your stock levels"
           />
 
-          <button
+          <Button
+            variant="primary"
             onClick={() =>
               setShowForm(!showForm)
             }
-            className="
-            flex items-center gap-2
-            bg-gradient-to-r
-            from-[#8B4513]
-            to-[#D97706]
-            hover:opacity-90
-            text-white
-            px-5 py-3
-            rounded-2xl
-            shadow-md
-            text-sm font-medium
-            transition-all
-            "
           >
             <Plus className="size-4" />
             Add Item
-          </button>
+          </Button>
 
         </div>
 
         {/* ADD FORM */}
         {showForm && (
 
-          <div
-            className="
-            bg-white
-            rounded-[28px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            space-y-4
-            "
-          >
+          <Card className="space-y-4">
 
             <h2
               className="
@@ -168,8 +145,7 @@ export default function Inventory() {
 
             <div className="grid md:grid-cols-2 gap-4">
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Item Name"
                 onChange={(e) =>
                   setNewItem({
@@ -179,8 +155,7 @@ export default function Inventory() {
                 }
               />
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Category"
                 onChange={(e) =>
                   setNewItem({
@@ -190,9 +165,8 @@ export default function Inventory() {
                 }
               />
 
-              <input
+              <Input
                 type="number"
-                className="input-coffee"
                 placeholder="Stock"
                 onChange={(e) =>
                   setNewItem({
@@ -204,8 +178,7 @@ export default function Inventory() {
                 }
               />
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Unit"
                 onChange={(e) =>
                   setNewItem({
@@ -217,36 +190,20 @@ export default function Inventory() {
 
             </div>
 
-            <button
+            <Button
+              variant="primary"
               onClick={handleAddItem}
-              className="
-              bg-[#8B4513]
-              hover:bg-[#6F3410]
-              text-white
-              px-5 py-3
-              rounded-xl
-              text-sm
-              font-medium
-              transition-all
-              "
             >
               Submit
-            </button>
+            </Button>
 
-          </div>
+          </Card>
         )}
 
         {/* LOW STOCK */}
         {lowStockItems.length > 0 && (
 
-          <div
-            className="
-            bg-[#FFF7ED]
-            border border-[#FED7AA]
-            rounded-[28px]
-            p-6
-            "
-          >
+          <Card className="bg-[#FFF7ED] border-[#FED7AA]">
 
             <div className="flex items-center gap-3">
 
@@ -271,41 +228,31 @@ export default function Inventory() {
                   mt-1
                   "
                 >
-                  {lowStockItems.length} item(s)
-                  need attention
+                  {lowStockItems.length} item(s) need attention
                 </p>
 
               </div>
 
             </div>
 
-          </div>
+          </Card>
         )}
 
         {/* SEARCH */}
-        <input
+        <SearchBar
           placeholder="Search inventory..."
-          className="input-coffee w-full max-w-sm"
+          className="w-full max-w-sm"
           onChange={(e) =>
             setSearch(e.target.value)
           }
         />
 
-        {/* INVENTORY GRID */}
+        {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
 
           {filtered.map((i) => (
 
-            <div
-              key={i.itemId}
-              className="
-              bg-white
-              rounded-[28px]
-              border border-[#F1DFC8]
-              shadow-sm
-              p-6
-              "
-            >
+            <Card key={i.itemId}>
 
               {/* TOP */}
               <div className="flex items-start justify-between">
@@ -347,23 +294,15 @@ export default function Inventory() {
 
                 </div>
 
-                {/* STATUS */}
-                <span
-                  className={`
-                  text-xs
-                  px-3 py-1
-                  rounded-full
-                  font-medium
-
-                  ${
+                <Badge
+                  color={
                     i.status === "Low"
-                      ? "bg-red-100 text-red-600"
-                      : "bg-green-100 text-green-700"
+                      ? "red"
+                      : "green"
                   }
-                `}
                 >
                   {i.status}
-                </span>
+                </Badge>
 
               </div>
 
@@ -397,53 +336,35 @@ export default function Inventory() {
               {/* ACTION */}
               <div className="flex gap-3 mt-6">
 
-                <button
+                <Button
+                  variant="secondary"
+                  className="flex-1 h-[45px]"
                   onClick={() =>
                     setSelected({
                       ...i,
                       type: "add",
                     })
                   }
-                  className="
-                  flex-1
-                  bg-green-100
-                  hover:bg-green-200
-                  text-green-700
-                  py-2.5
-                  rounded-xl
-                  text-sm
-                  font-medium
-                  transition-all
-                  "
                 >
                   + Add
-                </button>
+                </Button>
 
-                <button
+                <Button
+                  variant="danger"
+                  className="flex-1 h-[45px]"
                   onClick={() =>
                     setSelected({
                       ...i,
                       type: "use",
                     })
                   }
-                  className="
-                  flex-1
-                  bg-red-100
-                  hover:bg-red-200
-                  text-red-700
-                  py-2.5
-                  rounded-xl
-                  text-sm
-                  font-medium
-                  transition-all
-                  "
                 >
                   Use
-                </button>
+                </Button>
 
               </div>
 
-            </div>
+            </Card>
           ))}
 
         </div>
@@ -451,54 +372,39 @@ export default function Inventory() {
         {/* MODAL */}
         {selected && (
 
-          <div
-            className="
-            fixed inset-0
-            bg-black/30
-            flex items-center justify-center
-            z-50
-            "
-          >
+          <Modal open={true}>
 
-            <div
-              className="
-              bg-white
-              rounded-[28px]
-              p-6
-              w-[400px]
-              shadow-xl
-              "
-            >
+            <div className="space-y-5">
 
-              <h2
-                className="
-                text-[20px]
-                font-semibold
-                text-[#5B2E0F]
-                "
-              >
-                {selected.type === "add"
-                  ? "Add Stock"
-                  : "Use Stock"}
-              </h2>
+              <div>
 
-              <p
-                className="
-                text-[14px]
-                text-[#A16207]
-                mt-2
-                "
-              >
-                {selected.name}
-              </p>
+                <h2
+                  className="
+                  text-[20px]
+                  font-semibold
+                  text-[#5B2E0F]
+                  "
+                >
+                  {selected.type === "add"
+                    ? "Add Stock"
+                    : "Use Stock"}
+                </h2>
 
-              <input
+                <p
+                  className="
+                  text-[14px]
+                  text-[#A16207]
+                  mt-2
+                  "
+                >
+                  {selected.name}
+                </p>
+
+              </div>
+
+              <Input
                 type="number"
                 placeholder="Quantity"
-                className="
-                input-coffee
-                mt-5
-                "
                 onChange={(e) =>
                   setQty(
                     Number(e.target.value)
@@ -506,44 +412,31 @@ export default function Inventory() {
                 }
               />
 
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3">
 
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() =>
                     setSelected(null)
                   }
-                  className="
-                  px-4 py-2
-                  rounded-xl
-                  text-sm
-                  hover:bg-gray-100
-                  "
                 >
                   Cancel
-                </button>
+                </Button>
 
-                <button
+                <Button
+                  variant="primary"
                   onClick={
                     handleUpdateStock
                   }
-                  className="
-                  bg-[#8B4513]
-                  hover:bg-[#6F3410]
-                  text-white
-                  px-5 py-2
-                  rounded-xl
-                  text-sm
-                  font-medium
-                  "
                 >
                   Submit
-                </button>
+                </Button>
 
               </div>
 
             </div>
 
-          </div>
+          </Modal>
         )}
 
       </div>

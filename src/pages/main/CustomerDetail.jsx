@@ -2,18 +2,31 @@ import { useParams, Link } from "react-router-dom";
 
 import customers from "../../data/customers.json";
 import orders from "../../data/orders.json";
-import NotFound from "../main/ErrorPage";
+
 import PageHeader from "../../components/PageHeader";
 import ErrorPage from "./ErrorPage";
+
+import Button from "../../components/Button";
+import Card from "../../components/Card";
+import Badge from "../../components/Badge";
+import Table from "../../components/Table";
 
 export default function CustomerDetail() {
 
   const { id } = useParams();
 
-
   const customer = customers.find(
     (c) => c.customerId === id
   );
+
+  if (!customer) {
+    return (
+      <ErrorPage
+        code="404"
+        message="Customer Not Found"
+      />
+    );
+  }
 
   // CUSTOMER ORDERS
   const customerOrders = orders.filter(
@@ -21,7 +34,7 @@ export default function CustomerDetail() {
       o.customer
         .toLowerCase()
         .includes(
-          customer?.customerName
+          customer.customerName
             .split(" ")[0]
             .toLowerCase()
         )
@@ -39,20 +52,11 @@ export default function CustomerDetail() {
     0
   );
 
- if (!customer) {
-  return (
-    <ErrorPage
-      code="404"
-      message="Customer Not Found"
-    />
-  );
-}
-
   return (
 
-    <div className="flex-1 min-h-screen">
+    <div className="flex-1 min-h-screen bg-[#F8F4EE]">
 
-      <div className="p-5 space-y-5">
+      <div className="p-6 space-y-6">
 
         {/* HEADER */}
         <PageHeader
@@ -60,327 +64,353 @@ export default function CustomerDetail() {
           breadcrumb={`Dashboard / Customers / ${customer.customerName}`}
         >
 
-          <Link
-            to="/customers"
-            className="btn-coffee"
-          >
-            Back
+          <Link to="/customers">
+
+            <Button variant="secondary">
+              Back
+            </Button>
+
           </Link>
 
         </PageHeader>
 
         {/* PROFILE */}
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-3 gap-6">
 
           {/* LEFT */}
-          <div className="card-coffee text-center">
+          <Card>
 
-            <div className="w-24 h-24 rounded-full bg-soft mx-auto flex items-center justify-center text-3xl font-bold text-primary">
+            <div className="text-center">
 
-              {customer.customerName.charAt(0)}
+              <div
+                className="
+                w-24 h-24
+                rounded-full
+                bg-[#FFF7ED]
+                mx-auto
+                flex items-center justify-center
+                text-3xl
+                font-bold
+                text-[#D97706]
+                "
+              >
+
+                {customer.customerName.charAt(0)}
+
+              </div>
+
+              <h2
+                className="
+                text-[28px]
+                font-bold
+                text-[#5B2E0F]
+                mt-5
+                "
+              >
+                {customer.customerName}
+              </h2>
+
+              <p className="text-[#A16207] mt-2">
+                {customer.email}
+              </p>
+
+              <p className="text-[#A16207]">
+                {customer.phone}
+              </p>
+
+              <div className="mt-5">
+
+                <Badge
+                  color={
+                    customer.loyalty === "Gold"
+                      ? "yellow"
+                      : customer.loyalty === "Silver"
+                      ? "blue"
+                      : "red"
+                  }
+                >
+                  {customer.loyalty} Member
+                </Badge>
+
+              </div>
 
             </div>
 
-            <h2 className="text-2xl font-semibold text-primary mt-4">
-
-              {customer.customerName}
-
-            </h2>
-
-            <p className="text-sub mt-1">
-              {customer.email}
-            </p>
-
-            <p className="text-sub">
-              {customer.phone}
-            </p>
-
-            <span
-              className={`inline-block mt-4 px-4 py-2 rounded-full text-sm font-medium
-              ${
-                customer.loyalty === "Gold" &&
-                "bg-yellow-100 text-yellow-700"
-              }
-              ${
-                customer.loyalty === "Silver" &&
-                "bg-gray-200 text-gray-700"
-              }
-              ${
-                customer.loyalty === "Bronze" &&
-                "bg-orange-100 text-orange-700"
-              }`}
-            >
-              {customer.loyalty} Member
-            </span>
-
-          </div>
+          </Card>
 
           {/* RIGHT */}
-          <div className="md:col-span-2 grid md:grid-cols-2 gap-5">
+          <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
 
-            {/* TOTAL ORDERS */}
-            <div className="card-coffee">
+            <Card>
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Total Orders
               </p>
 
-              <h2 className="text-3xl font-bold text-primary mt-2">
-
+              <h2
+                className="
+                text-[34px]
+                font-bold
+                text-[#5B2E0F]
+                mt-2
+                "
+              >
                 {customer.totalOrders}
-
               </h2>
 
-            </div>
+            </Card>
 
-            {/* TOTAL SPENT */}
-            <div className="card-coffee">
+            <Card>
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Total Spent
               </p>
 
-              <h2 className="text-3xl font-bold text-primary mt-2">
-
+              <h2
+                className="
+                text-[34px]
+                font-bold
+                text-[#5B2E0F]
+                mt-2
+                "
+              >
                 Rp{" "}
-
                 {customer.totalSpent.toLocaleString(
                   "id-ID"
                 )}
-
               </h2>
 
-            </div>
+            </Card>
 
-            {/* FAVORITE MENU */}
-            <div className="card-coffee">
+            <Card>
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Favorite Menu
               </p>
 
-              <h2 className="text-xl font-semibold text-primary mt-2">
-
+              <h2
+                className="
+                text-[22px]
+                font-semibold
+                text-[#5B2E0F]
+                mt-2
+                "
+              >
                 {customer.favoriteMenu}
-
               </h2>
 
-            </div>
+            </Card>
 
-            {/* MEMBER STATUS */}
-            <div className="card-coffee">
+            <Card>
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Member Status
               </p>
 
-              <h2 className="text-xl font-semibold text-primary mt-2">
-
+              <h2
+                className="
+                text-[22px]
+                font-semibold
+                text-[#5B2E0F]
+                mt-2
+                "
+              >
                 {customer.memberStatus}
-
               </h2>
 
-            </div>
+            </Card>
 
-            {/* JOIN DATE */}
-            <div className="card-coffee">
+            <Card>
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Join Date
               </p>
 
-              <h2 className="text-xl font-semibold text-primary mt-2">
-
+              <h2
+                className="
+                text-[22px]
+                font-semibold
+                text-[#5B2E0F]
+                mt-2
+                "
+              >
                 {customer.joinDate}
-
               </h2>
 
-            </div>
+            </Card>
 
-            {/* LAST ORDER */}
-            <div className="card-coffee">
+            <Card>
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Last Order
               </p>
 
-              <h2 className="text-xl font-semibold text-primary mt-2">
-
+              <h2
+                className="
+                text-[22px]
+                font-semibold
+                text-[#5B2E0F]
+                mt-2
+                "
+              >
                 {customer.lastOrder}
-
               </h2>
 
-            </div>
+            </Card>
 
           </div>
 
         </div>
 
         {/* NOTES */}
-        <div className="card-coffee">
+        <Card>
 
-          <p className="text-sm text-muted mb-3">
+          <p className="text-sm text-gray-500 mb-3">
             Customer Notes
           </p>
 
-          <p className="text-sub">
+          <p className="text-[#6B4F3A] leading-relaxed">
             {customer.notes}
           </p>
 
-        </div>
+        </Card>
 
         {/* ORDER HISTORY */}
-        <div className="card-coffee">
+        <Card>
 
-          <div className="flex justify-between items-center mb-5">
+          <div className="flex justify-between items-center mb-6">
 
             <div>
 
-              <h2 className="text-xl font-semibold text-primary">
-
+              <h2
+                className="
+                text-[24px]
+                font-semibold
+                text-[#5B2E0F]
+                "
+              >
                 Order History
-
               </h2>
 
-              <p className="text-muted text-sm">
-
+              <p className="text-sm text-[#A16207] mt-1">
                 Customer transaction history
-
               </p>
 
             </div>
 
             <div className="text-right">
 
-              <p className="text-sm text-muted">
+              <p className="text-sm text-gray-500">
                 Revenue
               </p>
 
-              <h2 className="text-2xl font-bold text-primary">
-
+              <h2
+                className="
+                text-[28px]
+                font-bold
+                text-[#5B2E0F]
+                "
+              >
                 Rp {totalRevenue.toLocaleString("id-ID")}
-
               </h2>
 
             </div>
 
           </div>
 
-          {/* TABLE */}
-          <table className="w-full">
+          <Table
+            headers={[
+              "Order ID",
+              "Items",
+              "Payment",
+              "Status",
+              "Total",
+            ]}
+          >
 
-            <thead className="bg-soft text-sub text-sm">
+            {customerOrders.map((o) => (
 
-              <tr>
+              <tr
+                key={o.orderId}
+                className="
+                border-t border-[#F5E7D4]
+                hover:bg-[#FFFBF6]
+                transition-all
+                "
+              >
 
-                <th className="p-4 text-left">
-                  Order ID
-                </th>
+                {/* ORDER ID */}
+                <td className="p-5 font-medium text-[#5B2E0F]">
+                  {o.orderId}
+                </td>
 
-                <th className="p-4 text-left">
-                  Items
-                </th>
+                {/* ITEMS */}
+                <td className="p-5 text-sm text-[#6B4F3A]">
 
-                <th className="p-4 text-center">
-                  Payment
-                </th>
+                  {o.items
+                    .map(
+                      (i) =>
+                        `${i.name} x${i.qty}`
+                    )
+                    .join(", ")}
 
-                <th className="p-4 text-center">
-                  Status
-                </th>
+                </td>
 
-                <th className="p-4 text-right">
-                  Total
-                </th>
+                {/* PAYMENT */}
+                <td className="p-5 text-center text-[#6B4F3A]">
+                  {o.paymentMethod}
+                </td>
+
+                {/* STATUS */}
+                <td className="p-5 text-center">
+
+                  <Badge
+                    color={
+                      o.status === "Completed"
+                        ? "green"
+                        : "yellow"
+                    }
+                  >
+                    {o.status}
+                  </Badge>
+
+                </td>
+
+                {/* TOTAL */}
+                <td
+                  className="
+                  p-5
+                  text-right
+                  font-semibold
+                  text-[#5B2E0F]
+                  "
+                >
+                  Rp{" "}
+
+                  {o.items
+                    .reduce(
+                      (a, b) =>
+                        a +
+                        b.qty * b.price,
+                      0
+                    )
+                    .toLocaleString(
+                      "id-ID"
+                    )}
+
+                </td>
 
               </tr>
 
-            </thead>
+            ))}
 
-            <tbody>
+          </Table>
 
-              {customerOrders.map((o) => (
-
-                <tr
-                  key={o.orderId}
-                  className="border-t border-soft"
-                >
-
-                  {/* ORDER ID */}
-                  <td className="p-4 font-medium">
-                    {o.orderId}
-                  </td>
-
-                  {/* ITEMS */}
-                  <td className="p-4 text-sm">
-
-                    {o.items
-                      .map(
-                        (i) =>
-                          `${i.name} x${i.qty}`
-                      )
-                      .join(", ")}
-
-                  </td>
-
-                  {/* PAYMENT */}
-                  <td className="p-4 text-center">
-                    {o.paymentMethod}
-                  </td>
-
-                  {/* STATUS */}
-                  <td className="p-4 text-center">
-
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium
-                      ${
-                        o.status ===
-                          "Completed" &&
-                        "bg-green-100 text-green-600"
-                      }
-                      ${
-                        o.status ===
-                          "Pending" &&
-                        "bg-yellow-100 text-yellow-600"
-                      }`}
-                    >
-                      {o.status}
-                    </span>
-
-                  </td>
-
-                  {/* TOTAL */}
-                  <td className="p-4 text-right font-semibold text-primary">
-
-                    Rp{" "}
-
-                    {o.items
-                      .reduce(
-                        (a, b) =>
-                          a +
-                          b.qty * b.price,
-                        0
-                      )
-                      .toLocaleString(
-                        "id-ID"
-                      )}
-
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
+        </Card>
 
       </div>
 
     </div>
 
   );
-
 }

@@ -3,6 +3,12 @@ import { useState } from "react";
 import menuData from "../../data/menu.json";
 
 import PageHeader from "../../components/PageHeader";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import Card from "../../components/Card";
+import Badge from "../../components/Badge";
+import SearchBar from "../../components/SearchBar";
+import FilterSelect from "../../components/FilterSelect";
 
 import {
   Plus,
@@ -14,13 +20,9 @@ import {
 export default function Menu() {
 
   const [menus, setMenus] = useState(menuData);
-
   const [search, setSearch] = useState("");
-
   const [filter, setFilter] = useState("");
-
   const [showForm, setShowForm] = useState(false);
-
   const [editing, setEditing] = useState(null);
 
   const [newMenu, setNewMenu] = useState({
@@ -31,7 +33,6 @@ export default function Menu() {
     stock: 0,
   });
 
-  // FILTER
   const filtered = menus.filter(
     (m) =>
       m.name
@@ -63,7 +64,6 @@ export default function Menu() {
 
       setMenus([
         ...menus,
-
         {
           ...newMenu,
           menuId: Date.now(),
@@ -108,7 +108,6 @@ export default function Menu() {
     setShowForm(true);
   };
 
-  // GROUP CATEGORY
   const categories = [
     "Coffee",
     "Non-Coffee",
@@ -128,43 +127,22 @@ export default function Menu() {
             breadcrumb="Manage your coffee shop menu"
           />
 
-          <button
+          <Button
+            variant="primary"
             onClick={() =>
               setShowForm(!showForm)
             }
-            className="
-            flex items-center gap-2
-            bg-gradient-to-r
-            from-[#D97706]
-            to-[#F59E0B]
-            hover:opacity-90
-            text-white
-            px-5 py-3
-            rounded-2xl
-            shadow-md
-            text-sm font-medium
-            transition-all
-            "
           >
             <Plus className="size-4" />
             Add Menu
-          </button>
+          </Button>
 
         </div>
 
         {/* FORM */}
         {showForm && (
 
-          <div
-            className="
-            bg-white
-            rounded-[28px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            space-y-4
-            "
-          >
+          <Card className="space-y-4">
 
             <h2
               className="
@@ -180,8 +158,7 @@ export default function Menu() {
 
             <div className="grid md:grid-cols-2 gap-4">
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Menu Name"
                 value={newMenu.name}
                 onChange={(e) =>
@@ -192,38 +169,24 @@ export default function Menu() {
                 }
               />
 
-              <select
-                className="input-coffee"
+              <FilterSelect
+                options={[
+                  "Select Category",
+                  "Coffee",
+                  "Non-Coffee",
+                  "Snack",
+                ]}
                 value={newMenu.category}
                 onChange={(e) =>
                   setNewMenu({
                     ...newMenu,
-                    category:
-                      e.target.value,
+                    category: e.target.value,
                   })
                 }
-              >
-                <option value="">
-                  Select Category
-                </option>
+              />
 
-                <option>
-                  Coffee
-                </option>
-
-                <option>
-                  Non-Coffee
-                </option>
-
-                <option>
-                  Snack
-                </option>
-
-              </select>
-
-              <input
+              <Input
                 type="number"
-                className="input-coffee"
                 placeholder="Price"
                 value={newMenu.price}
                 onChange={(e) =>
@@ -236,9 +199,8 @@ export default function Menu() {
                 }
               />
 
-              <input
+              <Input
                 type="number"
-                className="input-coffee"
                 placeholder="Stock"
                 value={newMenu.stock}
                 onChange={(e) =>
@@ -251,11 +213,8 @@ export default function Menu() {
                 }
               />
 
-              <input
-                className="
-                input-coffee
-                md:col-span-2
-                "
+              <Input
+                className="md:col-span-2"
                 placeholder="Image URL"
                 value={newMenu.image}
                 onChange={(e) =>
@@ -268,71 +227,50 @@ export default function Menu() {
 
             </div>
 
-            <button
+            <Button
+              variant="primary"
               onClick={addMenu}
-              className="
-              bg-[#8B4513]
-              hover:bg-[#6F3410]
-              text-white
-              px-5 py-3
-              rounded-xl
-              text-sm
-              font-medium
-              transition-all
-              "
             >
               {editing
                 ? "Update Menu"
                 : "Submit"}
-            </button>
+            </Button>
 
-          </div>
+          </Card>
         )}
 
         {/* FILTER */}
         <div className="flex gap-4">
 
-          <input
-            className="
-            input-coffee
-            w-full max-w-sm
-            "
+          <SearchBar
             placeholder="Search menu..."
+            className="w-full max-w-sm"
             onChange={(e) =>
               setSearch(e.target.value)
             }
           />
 
-          <select
-            className="
-            input-coffee
-            w-[220px]
-            "
+          <FilterSelect
+            options={[
+              "All Categories",
+              "Coffee",
+              "Non-Coffee",
+              "Snack",
+            ]}
+            className="w-[220px]"
             onChange={(e) =>
-              setFilter(e.target.value)
+              setFilter(
+                e.target.value ===
+                  "All Categories"
+                  ? ""
+                  : e.target.value
+              )
             }
-          >
-            <option value="">
-              All Categories
-            </option>
-
-            <option>
-              Coffee
-            </option>
-
-            <option>
-              Non-Coffee
-            </option>
-
-            <option>
-              Snack
-            </option>
-
-          </select>
+          />
 
         </div>
 
-        {/* CATEGORY SECTION */}
+        {/* CATEGORY */}
         {categories.map((category) => {
 
           const categoryItems =
@@ -364,17 +302,14 @@ export default function Menu() {
 
                 {categoryItems.map((m) => (
 
-                  <div
+                  <Card
                     key={m.menuId}
                     className="
-                    bg-white
-                    rounded-[28px]
-                    border border-[#F1DFC8]
-                    shadow-sm
                     overflow-hidden
                     hover:-translate-y-1
                     hover:shadow-lg
                     transition-all duration-300
+                    p-0
                     "
                   >
 
@@ -423,25 +358,17 @@ export default function Menu() {
 
                         </div>
 
-                        {/* STOCK */}
-                        <span
-                          className={`
-                          text-xs
-                          px-3 py-1
-                          rounded-full
-                          font-medium
-
-                          ${
+                        <Badge
+                          color={
                             m.stock < 5
-                              ? "bg-red-100 text-red-600"
-                              : "bg-green-100 text-green-700"
+                              ? "red"
+                              : "green"
                           }
-                        `}
                         >
                           {m.stock < 5
                             ? "Low Stock"
                             : "Available"}
-                        </span>
+                        </Badge>
 
                       </div>
 
@@ -476,47 +403,33 @@ export default function Menu() {
                       {/* ACTION */}
                       <div className="flex gap-3 mt-6">
 
-                        <button
+                        <Button
+                          variant="outline"
+                          className="flex-1 h-[45px]"
                           onClick={() =>
                             editMenu(m)
                           }
-                          className="
-                          flex-1
-                          border border-[#EADBC8]
-                          hover:bg-[#FFF7ED]
-                          py-2.5
-                          rounded-xl
-                          flex items-center justify-center
-                          transition-all
-                          "
                         >
-                          <Pencil className="size-4 text-[#8B4513]" />
-                        </button>
+                          <Pencil className="size-4" />
+                        </Button>
 
-                        <button
+                        <Button
+                          variant="danger"
+                          className="flex-1 h-[45px] text-red-600 hover:bg-red-50"
                           onClick={() =>
                             deleteMenu(
                               m.menuId
                             )
                           }
-                          className="
-                          flex-1
-                          border border-red-200
-                          hover:bg-red-50
-                          py-2.5
-                          rounded-xl
-                          flex items-center justify-center
-                          transition-all
-                          "
                         >
-                          <Trash2 className="size-4 text-red-600" />
-                        </button>
+                          <Trash2 className="size-4" />
+                        </Button>
 
                       </div>
 
                     </div>
 
-                  </div>
+                  </Card>
                 ))}
 
               </div>

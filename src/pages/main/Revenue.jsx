@@ -1,4 +1,6 @@
 import PageHeader from "../../components/PageHeader";
+import Card from "../../components/Card";
+import ChartCard from "../../components/ChartCard";
 
 import revenueData from "../../data/revenue.json";
 import orders from "../../data/orders.json";
@@ -147,368 +149,247 @@ export default function Revenue() {
   ];
 
   return (
-    <div
-      className="
-      flex-1
-      min-h-screen
-      bg-gradient-to-br
-      from-[#FFF7ED]
-      via-white
-      to-[#FFF1F2]
-      "
-    >
+    <div className="flex-1 min-h-screen bg-[#F8F4EE]">
 
-      <div className="p-8">
+      <div className="p-8 space-y-6">
 
         {/* HEADER */}
-        <div className="mb-8">
+        <PageHeader
+          title="Analytics & Reports"
+          breadcrumb="Insights into your coffee shop performance"
+        />
 
-          <PageHeader
-            title="Analytics & Reports"
-            breadcrumb="Insights into your coffee shop performance"
-          />
+        {/* DAILY SALES */}
+        <ChartCard
+          title="Daily Sales Trend"
+          description="Revenue over recent days"
+        >
 
-        </div>
+          <div className="h-[320px] mt-5">
 
-        <div className="space-y-6">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
 
-          {/* DAILY SALES */}
-          <div
-            className="
-            bg-white
-            rounded-[30px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            "
+              <LineChart
+                data={salesByDay}
+              >
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#F3E2C8"
+                />
+
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 11 }}
+                />
+
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                />
+
+                <Tooltip />
+
+                <Legend />
+
+                <Line
+                  type="monotone"
+                  dataKey="sales"
+                  stroke="#3B82F6"
+                  strokeWidth={3}
+                  name="Sales"
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </ChartCard>
+
+        {/* PIE */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* CATEGORY */}
+          <ChartCard
+            title="Sales by Category"
+            description="Revenue distribution across categories"
           >
 
-            <div className="mb-6">
-
-              <h2
-                className="
-                text-[24px]
-                font-semibold
-                text-gray-900
-                "
-              >
-                Daily Sales Trend
-              </h2>
-
-              <p
-                className="
-                text-gray-500
-                text-sm
-                mt-1
-                "
-              >
-                Revenue over recent days
-              </p>
-
-            </div>
-
-            <div className="h-[320px]">
+            <div className="h-[300px] mt-5">
 
               <ResponsiveContainer
                 width="100%"
                 height="100%"
               >
 
-                <LineChart
-                  data={salesByDay}
-                >
+                <PieChart>
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                  />
+                  <Pie
+                    data={categorySalesData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    dataKey="value"
+                    labelLine={false}
+                    label={({
+                      name,
+                      percent,
+                    }) =>
+                      `${name} ${(
+                        percent * 100
+                      ).toFixed(0)}%`
+                    }
+                  >
 
-                  <XAxis dataKey="date" />
+                    {categorySalesData.map(
+                      (
+                        entry,
+                        index
+                      ) => (
 
-                  <YAxis />
+                        <Cell
+                          key={index}
+                          fill={
+                            COLORS[
+                              index %
+                                COLORS.length
+                            ]
+                          }
+                        />
+
+                      )
+                    )}
+
+                  </Pie>
 
                   <Tooltip />
 
-                  <Legend />
-
-                  <Line
-                    type="monotone"
-                    dataKey="sales"
-                    stroke="#3B82F6"
-                    strokeWidth={3}
-                    name="Sales"
-                  />
-
-                </LineChart>
+                </PieChart>
 
               </ResponsiveContainer>
 
             </div>
 
-          </div>
+          </ChartCard>
 
-          {/* PIE */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            {/* CATEGORY */}
-            <div
-              className="
-              bg-white
-              rounded-[30px]
-              border border-[#F1DFC8]
-              shadow-sm
-              p-6
-              "
-            >
-
-              <div className="mb-6">
-
-                <h2
-                  className="
-                  text-[24px]
-                  font-semibold
-                  text-gray-900
-                  "
-                >
-                  Sales by Category
-                </h2>
-
-                <p
-                  className="
-                  text-gray-500
-                  text-sm
-                  mt-1
-                  "
-                >
-                  Revenue distribution across categories
-                </p>
-
-              </div>
-
-              <div className="h-[300px]">
-
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%"
-                >
-
-                  <PieChart>
-
-                    <Pie
-                      data={categorySalesData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={90}
-                      dataKey="value"
-                      labelLine={false}
-                      label={({
-                        name,
-                        percent,
-                      }) =>
-                        `${name} ${(
-                          percent * 100
-                        ).toFixed(0)}%`
-                      }
-                    >
-
-                      {categorySalesData.map(
-                        (
-                          entry,
-                          index
-                        ) => (
-
-                          <Cell
-                            key={index}
-                            fill={
-                              COLORS[
-                                index %
-                                  COLORS.length
-                              ]
-                            }
-                          />
-
-                        )
-                      )}
-
-                    </Pie>
-
-                    <Tooltip />
-
-                  </PieChart>
-
-                </ResponsiveContainer>
-
-              </div>
-
-            </div>
-
-            {/* PAYMENT */}
-            <div
-              className="
-              bg-white
-              rounded-[30px]
-              border border-[#F1DFC8]
-              shadow-sm
-              p-6
-              "
-            >
-
-              <div className="mb-6">
-
-                <h2
-                  className="
-                  text-[24px]
-                  font-semibold
-                  text-gray-900
-                  "
-                >
-                  Payment Methods
-                </h2>
-
-                <p
-                  className="
-                  text-gray-500
-                  text-sm
-                  mt-1
-                  "
-                >
-                  Distribution of payment types
-                </p>
-
-              </div>
-
-              <div className="h-[300px]">
-
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%"
-                >
-
-                  <PieChart>
-
-                    <Pie
-                      data={paymentMethodData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={90}
-                      dataKey="value"
-                      labelLine={false}
-                      label={({
-                        name,
-                        percent,
-                      }) =>
-                        `${name} ${(
-                          percent * 100
-                        ).toFixed(0)}%`
-                      }
-                    >
-
-                      {paymentMethodData.map(
-                        (
-                          entry,
-                          index
-                        ) => (
-
-                          <Cell
-                            key={index}
-                            fill={
-                              COLORS[
-                                index %
-                                  COLORS.length
-                              ]
-                            }
-                          />
-
-                        )
-                      )}
-
-                    </Pie>
-
-                    <Tooltip />
-
-                  </PieChart>
-
-                </ResponsiveContainer>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* TOP SELLING */}
-          <div
-            className="
-            bg-white
-            rounded-[30px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            "
+          {/* PAYMENT */}
+          <ChartCard
+            title="Payment Methods"
+            description="Distribution of payment types"
           >
 
-            <div className="mb-6">
-
-              <h2
-                className="
-                text-[24px]
-                font-semibold
-                text-gray-900
-                "
-              >
-                Top Selling Items
-              </h2>
-
-              <p
-                className="
-                text-gray-500
-                text-sm
-                mt-1
-                "
-              >
-                Best performing menu items by revenue
-              </p>
-
-            </div>
-
-            <div className="h-[320px]">
+            <div className="h-[300px] mt-5">
 
               <ResponsiveContainer
                 width="100%"
                 height="100%"
               >
 
-                <BarChart
-                  data={itemSales}
-                >
+                <PieChart>
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                  />
+                  <Pie
+                    data={paymentMethodData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    dataKey="value"
+                    labelLine={false}
+                    label={({
+                      name,
+                      percent,
+                    }) =>
+                      `${name} ${(
+                        percent * 100
+                      ).toFixed(0)}%`
+                    }
+                  >
 
-                  <XAxis dataKey="name" />
+                    {paymentMethodData.map(
+                      (
+                        entry,
+                        index
+                      ) => (
 
-                  <YAxis />
+                        <Cell
+                          key={index}
+                          fill={
+                            COLORS[
+                              index %
+                                COLORS.length
+                            ]
+                          }
+                        />
+
+                      )
+                    )}
+
+                  </Pie>
 
                   <Tooltip />
 
-                  <Legend />
-
-                  <Bar
-                    dataKey="revenue"
-                    fill="#10B981"
-                    radius={[8, 8, 0, 0]}
-                    name="Revenue"
-                  />
-
-                </BarChart>
+                </PieChart>
 
               </ResponsiveContainer>
 
             </div>
 
-          </div>
+          </ChartCard>
 
         </div>
+
+        {/* TOP SELLING */}
+        <ChartCard
+          title="Top Selling Items"
+          description="Best performing menu items by revenue"
+        >
+
+          <div className="h-[320px] mt-5">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <BarChart
+                data={itemSales}
+              >
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#F3E2C8"
+                />
+
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 11 }}
+                />
+
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                />
+
+                <Tooltip />
+
+                <Legend />
+
+                <Bar
+                  dataKey="revenue"
+                  fill="#10B981"
+                  radius={[8, 8, 0, 0]}
+                  name="Revenue"
+                />
+
+              </BarChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </ChartCard>
 
       </div>
 

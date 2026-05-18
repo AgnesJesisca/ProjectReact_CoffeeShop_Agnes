@@ -5,9 +5,16 @@ import customersData from "../../data/customers.json";
 
 import PageHeader from "../../components/PageHeader";
 
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import Card from "../../components/Card";
+import Badge from "../../components/Badge";
+import SearchBar from "../../components/SearchBar";
+import FilterSelect from "../../components/FilterSelect";
+
+
 import {
   Plus,
-  Search,
   Eye,
   Crown,
   UserRound,
@@ -78,6 +85,7 @@ export default function Customers() {
   };
 
   return (
+
     <div className="flex-1 min-h-screen bg-[#F8F4EE]">
 
       <div className="p-6 space-y-6">
@@ -90,42 +98,22 @@ export default function Customers() {
             breadcrumb="Manage coffee shop customers"
           />
 
-          <button
+          <Button
+            variant="primary"
             onClick={() =>
               setShowForm(!showForm)
             }
-            className="
-            flex items-center gap-2
-            bg-gradient-to-r
-            from-[#D97706]
-            to-[#F59E0B]
-            hover:opacity-90
-            text-white
-            px-5 py-3
-            rounded-2xl
-            shadow-md
-            text-sm font-medium
-            transition-all
-            "
           >
             <Plus className="size-4" />
             Add Customer
-          </button>
+          </Button>
 
         </div>
 
         {/* FORM */}
         {showForm && (
 
-          <div
-            className="
-            bg-white
-            rounded-[28px]
-            border border-[#F1DFC8]
-            shadow-sm
-            p-6
-            "
-          >
+          <Card>
 
             <h2
               className="
@@ -140,8 +128,7 @@ export default function Customers() {
 
             <div className="grid md:grid-cols-2 gap-4">
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Customer Name"
                 value={form.customerName}
                 onChange={(e) =>
@@ -153,8 +140,7 @@ export default function Customers() {
                 }
               />
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Email"
                 value={form.email}
                 onChange={(e) =>
@@ -166,8 +152,7 @@ export default function Customers() {
                 }
               />
 
-              <input
-                className="input-coffee"
+              <Input
                 placeholder="Phone Number"
                 value={form.phone}
                 onChange={(e) =>
@@ -179,8 +164,12 @@ export default function Customers() {
                 }
               />
 
-              <select
-                className="input-coffee"
+              <FilterSelect
+                options={[
+                  "Bronze",
+                  "Silver",
+                  "Gold",
+                ]}
                 value={form.loyalty}
                 onChange={(e) =>
                   setForm({
@@ -189,102 +178,51 @@ export default function Customers() {
                       e.target.value,
                   })
                 }
-              >
-                <option>
-                  Bronze
-                </option>
-
-                <option>
-                  Silver
-                </option>
-
-                <option>
-                  Gold
-                </option>
-
-              </select>
+              />
 
             </div>
 
-            <button
+            <Button
+              variant="primary"
+              className="mt-5"
               onClick={handleSubmit}
-              className="
-              mt-5
-              bg-[#8B4513]
-              hover:bg-[#6F3410]
-              text-white
-              px-5 py-3
-              rounded-xl
-              text-sm
-              font-medium
-              transition-all
-              "
             >
               Save Customer
-            </button>
+            </Button>
 
-          </div>
+          </Card>
         )}
 
         {/* FILTER */}
         <div className="flex gap-4">
 
-          <div className="relative w-full max-w-sm">
-
-            <Search
-              className="
-              absolute
-              left-4 top-1/2
-              -translate-y-1/2
-              text-[#A16207]
-              size-4
-              "
-            />
-
-            <input
-              placeholder="Search customer..."
-              className="
-              input-coffee
-              pl-11
-              "
-              onChange={(e) =>
-                setSearch(
-                  e.target.value
-                )
-              }
-            />
-
-          </div>
-
-          <select
-            className="
-            input-coffee
-            w-[220px]
-            "
+          <SearchBar
+            placeholder="Search customer..."
+            className="w-full max-w-sm"
             onChange={(e) =>
-              setFilter(
+              setSearch(
                 e.target.value
               )
             }
-          >
+          />
 
-            <option value="">
-              All Loyalty
-            </option>
-
-            <option>
-              Gold
-            </option>
-
-            <option>
-              Silver
-            </option>
-
-            <option>
-              Bronze
-            </option>
-
-          </select>
+          <FilterSelect
+            options={[
+              "All Loyalty",
+              "Gold",
+              "Silver",
+              "Bronze",
+            ]}
+            className="w-[220px]"
+            onChange={(e) =>
+              setFilter(
+                e.target.value ===
+                  "All Loyalty"
+                  ? ""
+                  : e.target.value
+              )
+            }
+          />
 
         </div>
 
@@ -293,14 +231,9 @@ export default function Customers() {
 
           {filtered.map((c) => (
 
-            <div
+            <Card
               key={c.customerId}
               className="
-              bg-white
-              rounded-[28px]
-              border border-[#F1DFC8]
-              shadow-sm
-              p-6
               hover:-translate-y-1
               hover:shadow-lg
               transition-all duration-300
@@ -352,42 +285,25 @@ export default function Customers() {
                 </div>
 
                 {/* BADGE */}
-                <span
-                  className={`
-                  px-3 py-1
-                  rounded-full
-                  text-xs
-                  font-medium
-                  flex items-center gap-1
-
-                  ${
-                    c.loyalty ===
-                    "Gold"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : ""
+                <Badge
+                  color={
+                    c.loyalty === "Gold"
+                      ? "gold"
+                      : c.loyalty === "Silver"
+                      ? "silver"
+                      : "bronze"
                   }
-
-                  ${
-                    c.loyalty ===
-                    "Silver"
-                      ? "bg-gray-200 text-gray-700"
-                      : ""
-                  }
-
-                  ${
-                    c.loyalty ===
-                    "Bronze"
-                      ? "bg-orange-100 text-orange-700"
-                      : ""
-                  }
-                `}
                 >
 
-                  <Crown className="size-3" />
+                  <div className="flex items-center gap-1">
 
-                  {c.loyalty}
+                    <Crown className="size-3" />
 
-                </span>
+                    {c.loyalty}
+
+                  </div>
+
+                </Badge>
 
               </div>
 
@@ -414,33 +330,29 @@ export default function Customers() {
               {/* ACTION */}
               <Link
                 to={`/customers/${c.customerId}`}
-                className="
-                mt-6
-                flex items-center justify-center gap-2
-                border border-[#EADBC8]
-                hover:bg-[#FFF7ED]
-                py-3
-                rounded-2xl
-                text-[#6B4F3A]
-                text-sm
-                font-medium
-                transition-all
-                "
               >
 
-                <Eye className="size-4" />
+                <Button
+                  variant="outline"
+                  className="w-full mt-6"
+                >
 
-                View Details
+                  <Eye className="size-4" />
+
+                  View Details
+
+                </Button>
 
               </Link>
 
-            </div>
+            </Card>
 
           ))}
 
         </div>
 
       </div>
+
 
     </div>
   );
@@ -452,12 +364,13 @@ function InfoBox({
 }) {
 
   return (
-    <div
+
+    <Card
       className="
       bg-[#FFF7ED]
-      border border-[#F4E1C8]
-      rounded-2xl
+      border-[#F4E1C8]
       p-4
+      shadow-none
       "
     >
 
@@ -480,6 +393,7 @@ function InfoBox({
         {value}
       </h3>
 
-    </div>
+    </Card>
+
   );
 }

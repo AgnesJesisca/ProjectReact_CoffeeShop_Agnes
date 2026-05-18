@@ -24,7 +24,7 @@ const Forgot = lazy(() => import("./pages/auth/Forgot"));
 
 // COMPONENTS
 const Loading = lazy(() => import("./components/Loading"));
-
+const ComponentsPreview = lazy(() => import("./pages/main/ComponentsPreview"));
 function App() {
   return (
     <Suspense fallback={<Loading />}>
@@ -40,6 +40,7 @@ function App() {
           <Route path="/menu" element={<Menu />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/revenue" element={<Revenue />} />
+          <Route path="/components-preview" element={<ComponentsPreview />}/>
 
           {/* ERROR */}
           <Route path="/400" element={<ErrorPage code="400" message="Bad Request" />} />

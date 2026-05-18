@@ -1,7 +1,14 @@
 import { useParams, Link } from "react-router-dom";
+
 import orders from "../../data/orders.json";
+
 import PageHeader from "../../components/PageHeader";
 import ErrorPage from "./ErrorPage";
+
+import Button from "../../components/Button";
+import Card from "../../components/Card";
+import Badge from "../../components/Badge";
+import Table from "../../components/Table";
 
 export default function OrderDetail() {
 
@@ -11,27 +18,27 @@ export default function OrderDetail() {
     (o) => o.orderId === id
   );
 
-  // TOTAL
   const total =
     order?.items.reduce(
-      (a, b) => a + b.qty * b.price,
+      (a, b) =>
+        a + b.qty * b.price,
       0
     ) || 0;
 
   if (!order) {
-  return (
-    <ErrorPage
-      code="404"
-      message="Order Not Found"
-    />
-  );
-}
+
+    return (
+      <ErrorPage
+        code="404"
+        message="Order Not Found"
+      />
+    );
+  }
 
   return (
+    <div className="flex-1 min-h-screen bg-[#F8F4EE]">
 
-    <div className="flex-1 min-h-screen">
-
-      <div className="p-5 space-y-5">
+      <div className="p-6 space-y-6">
 
         {/* HEADER */}
         <PageHeader
@@ -39,11 +46,12 @@ export default function OrderDetail() {
           breadcrumb={`Dashboard / Orders / ${order.orderId}`}
         >
 
-          <Link
-            to="/orders"
-            className="btn-coffee"
-          >
-            Back
+          <Link to="/orders">
+
+            <Button variant="secondary">
+              Back
+            </Button>
+
           </Link>
 
         </PageHeader>
@@ -52,77 +60,134 @@ export default function OrderDetail() {
         <div className="grid md:grid-cols-3 gap-5">
 
           {/* CUSTOMER */}
-          <div className="card-coffee">
+          <Card>
 
-            <p className="text-sm text-muted mb-2">
+            <p
+              className="
+              text-sm
+              text-[#A16207]
+              mb-2
+              "
+            >
               Customer
             </p>
 
-            <h2 className="text-xl font-semibold text-primary">
+            <h2
+              className="
+              text-[24px]
+              font-semibold
+              text-[#5B2E0F]
+              "
+            >
               {order.customer}
             </h2>
 
-            <p className="mt-2 text-sub">
+            <p
+              className="
+              mt-2
+              text-[#6B4F3A]
+              "
+            >
               {order.customerPhone}
             </p>
 
-          </div>
+          </Card>
 
           {/* PAYMENT */}
-          <div className="card-coffee">
+          <Card>
 
-            <p className="text-sm text-muted mb-2">
+            <p
+              className="
+              text-sm
+              text-[#A16207]
+              mb-2
+              "
+            >
               Payment
             </p>
 
-            <h2 className="text-xl font-semibold text-primary">
+            <h2
+              className="
+              text-[24px]
+              font-semibold
+              text-[#5B2E0F]
+              "
+            >
               {order.paymentMethod}
             </h2>
 
-            <p className="mt-2 text-sub">
+            <p
+              className="
+              mt-2
+              text-[#6B4F3A]
+              "
+            >
               {order.orderType}
             </p>
 
-          </div>
+          </Card>
 
           {/* STATUS */}
-          <div className="card-coffee">
+          <Card>
 
-            <p className="text-sm text-muted mb-2">
+            <p
+              className="
+              text-sm
+              text-[#A16207]
+              mb-2
+              "
+            >
               Status
             </p>
 
-            <span
-              className={`px-3 py-2 rounded-full text-sm font-medium
-              ${
-                order.status === "Completed"
-                  ? "bg-green-100 text-green-600"
-                  : "bg-yellow-100 text-yellow-600"
-              }`}
+            <Badge
+              color={
+                order.status ===
+                "Completed"
+                  ? "green"
+                  : "yellow"
+              }
             >
               {order.status}
-            </span>
+            </Badge>
 
-            <p className="mt-3 text-sub">
+            <p
+              className="
+              mt-3
+              text-[#6B4F3A]
+              "
+            >
               {order.date}
             </p>
 
-          </div>
+          </Card>
 
         </div>
 
         {/* ITEMS */}
-        <div className="card-coffee">
+        <Card>
 
           <div className="flex justify-between items-center mb-5">
 
             <div>
 
-              <h2 className="text-xl font-semibold text-primary">
+              <h2
+                className="
+                text-[24px]
+                font-semibold
+                text-[#5B2E0F]
+                "
+              >
                 Order Items
               </h2>
 
-              <p className="text-muted text-sm">
+              <p
+                className="
+                text-[#A16207]
+                text-sm
+                mt-1
+                "
+              >
                 Detail customer order
               </p>
 
@@ -130,11 +195,22 @@ export default function OrderDetail() {
 
             <div className="text-right">
 
-              <p className="text-sm text-muted">
+              <p
+                className="
+                text-sm
+                text-[#A16207]
+                "
+              >
                 Total Payment
               </p>
 
-              <h2 className="text-2xl font-bold text-primary">
+              <h2
+                className="
+                text-[28px]
+                font-bold
+                text-[#5B2E0F]
+                "
+              >
                 Rp {total.toLocaleString("id-ID")}
               </h2>
 
@@ -143,51 +219,55 @@ export default function OrderDetail() {
           </div>
 
           {/* TABLE */}
-          <table className="w-full">
+          <Table
+            headers={[
+              "Menu",
+              "Qty",
+              "Price",
+              "Subtotal",
+            ]}
+          >
 
-            <thead className="bg-soft text-sub text-sm">
-
-              <tr>
-
-                <th className="p-4 text-left">
-                  Menu
-                </th>
-
-                <th className="p-4 text-center">
-                  Qty
-                </th>
-
-                <th className="p-4 text-right">
-                  Price
-                </th>
-
-                <th className="p-4 text-right">
-                  Subtotal
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {order.items.map((item, index) => (
+            {order.items.map(
+              (item, index) => (
 
                 <tr
                   key={index}
-                  className="border-t border-soft"
+                  className="
+                  border-t
+                  border-[#F5E7D4]
+                  hover:bg-[#FFFBF6]
+                  transition-all
+                  "
                 >
 
-                  <td className="p-4 font-medium">
+                  <td
+                    className="
+                    p-5
+                    font-medium
+                    text-[#5B2E0F]
+                    "
+                  >
                     {item.name}
                   </td>
 
-                  <td className="p-4 text-center">
+                  <td
+                    className="
+                    p-5
+                    text-center
+                    text-[#6B4F3A]
+                    "
+                  >
                     {item.qty}
                   </td>
 
-                  <td className="p-4 text-right">
-
+                  <td
+                    className="
+                    p-5
+                    text-right
+                    text-[#6B4F3A]
+                    "
+                  >
                     Rp{" "}
 
                     {item.price.toLocaleString(
@@ -196,60 +276,88 @@ export default function OrderDetail() {
 
                   </td>
 
-                  <td className="p-4 text-right font-semibold text-primary">
-
+                  <td
+                    className="
+                    p-5
+                    text-right
+                    font-semibold
+                    text-[#5B2E0F]
+                    "
+                  >
                     Rp{" "}
 
                     {(item.qty * item.price)
-                      .toLocaleString("id-ID")}
+                      .toLocaleString(
+                        "id-ID"
+                      )}
 
                   </td>
 
                 </tr>
 
-              ))}
+              )
+            )}
 
-            </tbody>
+          </Table>
 
-          </table>
+        </Card>
 
-        </div>
-
-        {/* EXTRA DETAIL */}
+        {/* EXTRA */}
         <div className="grid md:grid-cols-2 gap-5">
 
           {/* BARISTA */}
-          <div className="card-coffee">
+          <Card>
 
-            <p className="text-sm text-muted mb-2">
+            <p
+              className="
+              text-sm
+              text-[#A16207]
+              mb-2
+              "
+            >
               Barista
             </p>
 
-            <h2 className="text-xl font-semibold text-primary">
+            <h2
+              className="
+              text-[24px]
+              font-semibold
+              text-[#5B2E0F]
+              "
+            >
               {order.barista}
             </h2>
 
-          </div>
+          </Card>
 
           {/* NOTES */}
-          <div className="card-coffee">
+          <Card>
 
-            <p className="text-sm text-muted mb-2">
+            <p
+              className="
+              text-sm
+              text-[#A16207]
+              mb-2
+              "
+            >
               Order Notes
             </p>
 
-            <p className="text-sub">
+            <p
+              className="
+              text-[#6B4F3A]
+              leading-relaxed
+              "
+            >
               {order.notes || "-"}
             </p>
 
-          </div>
+          </Card>
 
         </div>
 
       </div>
 
     </div>
-
   );
-
 }
