@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import data from "../../data/inventory.json";
 
@@ -31,6 +31,22 @@ export default function Inventory() {
 
   const [selected, setSelected] = useState(null);
   const [qty, setQty] = useState(0);
+
+  const searchRef = useRef(null);
+
+    useEffect(() => {
+      document.title = "Inventory Management";
+    }, []);
+
+    useEffect(() => {
+      console.log(searchRef.current);
+    }, []);
+
+    useEffect(() => {
+      console.log(
+        `Jumlah item inventory: ${items.length}`
+      );
+    }, [items]);
 
   const filtered = items.filter((i) =>
     i.name.toLowerCase().includes(
@@ -239,7 +255,8 @@ export default function Inventory() {
         )}
 
         {/* SEARCH */}
-        <SearchBar
+       <SearchBar
+          ref={searchRef}
           placeholder="Search inventory..."
           className="w-full max-w-sm"
           onChange={(e) =>

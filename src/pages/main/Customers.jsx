@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import customersData from "../../data/customers.json";
@@ -41,6 +41,17 @@ export default function Customers() {
       phone: "",
       loyalty: "Bronze",
     });
+
+    const searchRef = useRef(null);
+
+    useEffect(() => {
+      document.title =
+        "Customers Management";
+    }, []);
+
+    useEffect(() => {
+      console.log(searchRef.current);
+    }, []);
 
   // FILTER
   const filtered = customers.filter(

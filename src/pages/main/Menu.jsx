@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import menuData from "../../data/menu.json";
 
 import PageHeader from "../../components/PageHeader";
@@ -57,6 +56,16 @@ export default function Menu() {
     stock: "",
   });
 
+  const searchRef = useRef(null);
+
+    useEffect(() => {
+      document.title = "Menu Management";
+    }, []);
+
+    useEffect(() => {
+      searchRef.current?.focus();
+    }, []);
+
   const filtered = menus.filter(
     (m) =>
       m.name
@@ -99,7 +108,7 @@ export default function Menu() {
       image: "",
       stock: "",
     });
-  }; // <-- DI SINI SEBELUMNYA KURANG PENUTUP KURUNG KURAWAL
+  }; 
 
   // DELETE MENU
   const deleteMenu = (id) => {
@@ -241,7 +250,9 @@ export default function Menu() {
         {/* FILTER */}
         <div className="flex gap-4">
           <SearchBar
+             ref={searchRef}
             placeholder="Search menu..."
+
             className="w-full max-w-sm"
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -349,6 +360,7 @@ export default function Menu() {
                             >
                               <Trash2 className="size-4" />
                             </Button>
+                            
                           </AlertDialogTrigger>
 
                           <AlertDialogContent>
