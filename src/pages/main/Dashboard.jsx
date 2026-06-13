@@ -1,7 +1,6 @@
 import PageHeader from "../../components/PageHeader";
 import DashboardCard from "../../components/DashboardCard";
 import ChartCard from "../../components/ChartCard";
-
 import revenue from "../../data/revenue.json";
 
 import {

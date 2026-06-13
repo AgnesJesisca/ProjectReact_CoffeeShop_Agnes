@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -9,11 +8,14 @@ import {
   Loader2,
 } from "lucide-react";
 
+import { usersAPI } from "../../services/usersAPI";
+
 import AuthCard from "../../components/AuthCard";
 import AuthInput from "../../components/AuthInput";
 import Button from "../../components/Button";
 
 export default function Login() {
+
   const navigate = useNavigate();
 
   const [loading, setLoading] =
@@ -30,6 +32,7 @@ export default function Login() {
 
   // HANDLE CHANGE
   const handleChange = (e) => {
+
     const { name, value } =
       e.target;
 
@@ -39,57 +42,56 @@ export default function Login() {
     });
   };
 
-  // SUBMIT
+  // LOGIN
   const handleSubmit = async (e) => {
+
     e.preventDefault();
 
     setLoading(true);
-
     setError("");
 
-    axios
-      .post(
-        "https://dummyjson.com/user/login",
-        {
-          username:
-            dataForm.email,
+    try {
 
-          password:
-            dataForm.password,
-        }
-      )
+      const users =
+        await usersAPI.fetchUsers();
 
-      .then((response) => {
-        if (
-          response.status !== 200
-        ) {
-          setError(
-            response.data.message
-          );
+      const user =
+        users.find(
+          (u) =>
+            u.email ===
+              dataForm.email &&
+            u.password ===
+              dataForm.password
+        );
 
-          return;
-        }
+      if (!user) {
 
-        navigate("/");
-      })
+        setError(
+          "Email atau Password salah"
+        );
 
-      .catch((err) => {
-        if (err.response) {
-          setError(
-            err.response.data
-              .message ||
-              "Invalid credentials"
-          );
-        } else {
-          setError(
-            "Something went wrong"
-          );
-        }
-      })
+        return;
+      }
 
-      .finally(() => {
-        setLoading(false);
-      });
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
+
+      navigate("/");
+
+    } catch (err) {
+
+      console.log(err);
+
+      setError(
+        "Gagal terhubung ke server"
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,6 +99,7 @@ export default function Login() {
       title="Welcome Back"
       subtitle="Login to your Coffee Shop dashboard"
     >
+
       {/* ERROR */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl px-4 py-3 mb-5 text-sm">
@@ -118,23 +121,26 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="space-y-5"
       >
-        <AuthInput
-          label="Email Address"
-          icon={<Mail />}
-          type="text"
-          name="email"
-          placeholder="you@example.com"
-          onChange={handleChange}
-        />
 
-        <AuthInput
-          label="Password"
-          icon={<Lock />}
-          type="password"
-          name="password"
-          placeholder="••••••••"
-          onChange={handleChange}
-        />
+      <AuthInput
+        label="Email Address"
+        icon={<Mail />}
+        type="email"
+        name="email"
+        placeholder="you@example.com"
+        value={dataForm.email}
+        onChange={handleChange}
+      />
+
+      <AuthInput
+        label="Password"
+        icon={<Lock />}
+        type="password"
+        name="password"
+        placeholder="••••••••"
+        value={dataForm.password}
+        onChange={handleChange}
+      />
 
         {/* FORGOT */}
         <div className="flex justify-end">
@@ -156,10 +162,12 @@ export default function Login() {
             ? "Loading..."
             : "Login"}
         </Button>
+
       </form>
 
       {/* FOOTER */}
       <div className="mt-8 text-center">
+
         <p className="text-sm text-[#A16207]">
           Don't have an account?{" "}
 
@@ -169,8 +177,11 @@ export default function Login() {
           >
             Register
           </Link>
+
         </p>
+
       </div>
+
     </AuthCard>
   );
 }
