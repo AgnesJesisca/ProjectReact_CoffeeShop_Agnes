@@ -26,7 +26,7 @@ const Menu = lazy(() => import("./pages/main/Menu"));
 const Inventory = lazy(() => import("./pages/main/Inventory"));
 const OrderDetail = lazy(() => import("./pages/main/OrderDetail"));
 const CustomerDetail = lazy(() => import("./pages/main/CustomerDetail"));
-const UserManagement = lazy(() => import("./pages/main/Usermanagement"));
+const UserManagement = lazy(() => import("./pages/main/UserManagement"));
 const ErrorPage = lazy(() => import("./pages/main/ErrorPage"));
 const Reviews = lazy(() => import("./pages/main/Reviews"));
 
