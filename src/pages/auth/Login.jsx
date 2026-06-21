@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, AlertCircle, Loader2, Coffee } from "lucide-react";
+import { Mail, Lock, AlertCircle, Loader2, Coffee, Info } from "lucide-react";
 import { usersAPI } from "../../services/usersAPI";
 import AuthInput from "../../components/AuthInput";
 import Button from "../../components/Button";
@@ -59,7 +59,7 @@ export default function Login() {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#EEDFCE]/40 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-      {/* SATU-SATUNYA CARD YANG AKTIF (Menghilangkan total card luar) */}
+      {/* CARD UTAMA */}
       <div className="w-full max-w-[420px] bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl shadow-amber-900/5 z-50">
         
         {/* BRANDING LOGO & JUDUL */}
@@ -137,8 +137,28 @@ export default function Login() {
           </div>
         </form>
 
+        {/* KOTAK SAMPEL LOGIN (DEMO ACCOUNT) */}
+        <div className="mt-5 p-3.5 bg-amber-50/60 border border-amber-200/40 rounded-2xl text-[11px] text-amber-900/80">
+          <div className="flex items-center gap-1.5 font-bold text-[#3D2517] mb-1.5">
+            <Info className="size-3.5 text-[#D97706]" />
+            <span>Akun Sampel Login:</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-gray-600">
+            <div className="p-1.5 bg-white/80 rounded-lg border border-amber-100">
+              <p className="font-bold text-[#D97706] mb-0.5">🟢 Admin</p>
+              <p>Email: <span className="font-mono text-gray-800 selection:bg-amber-200">admin@gmail.com</span></p>
+              <p>Pass: <span className="font-mono text-gray-800">123</span></p>
+            </div>
+            <div className="p-1.5 bg-white/80 rounded-lg border border-amber-100">
+              <p className="font-bold text-[#D97706] mb-0.5">🔵 Customer</p>
+              <p>Email: <span className="font-mono text-gray-800">andi@mail.com</span></p>
+              <p>Pass: <span className="font-mono text-gray-800">password123</span></p>
+            </div>
+          </div>
+        </div>
+
         {/* PERPINDAHAN LINK KE REGISTRASI */}
-        <div className="mt-8 pt-4 border-t border-gray-100 text-center">
+        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
           <p className="text-xs text-gray-400 font-medium">
             Don't have an account?{" "}
             <Link
