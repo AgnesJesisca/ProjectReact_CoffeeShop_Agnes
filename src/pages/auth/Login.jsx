@@ -1,187 +1,156 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
-import {
-  Mail,
-  Lock,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
-
+import { Mail, Lock, AlertCircle, Loader2, Coffee } from "lucide-react";
 import { usersAPI } from "../../services/usersAPI";
-
-import AuthCard from "../../components/AuthCard";
 import AuthInput from "../../components/AuthInput";
 import Button from "../../components/Button";
 
 export default function Login() {
-
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [dataForm, setDataForm] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [loading, setLoading] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
-
-  const [dataForm, setDataForm] =
-    useState({
-      email: "",
-      password: "",
-    });
-
-  // HANDLE CHANGE
   const handleChange = (e) => {
-
-    const { name, value } =
-      e.target;
-
+    const { name, value } = e.target;
     setDataForm({
       ...dataForm,
       [name]: value,
     });
   };
 
-  // LOGIN
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-
     setLoading(true);
     setError("");
 
     try {
-
-      const users =
-        await usersAPI.fetchUsers();
-
-      const user =
-        users.find(
-          (u) =>
-            u.email ===
-              dataForm.email &&
-            u.password ===
-              dataForm.password
-        );
+      const users = await usersAPI.fetchUsers();
+      const user = users.find(
+        (u) => u.email === dataForm.email && u.password === dataForm.password
+      );
 
       if (!user) {
-
-        setError(
-          "Email atau Password salah"
-        );
-
+        setError("Email atau Password salah. Silakan coba lagi.");
         return;
       }
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
+      localStorage.setItem("user", JSON.stringify(user));
 
-      navigate("/");
-
+      if (user.role === "Admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/member");
+      }
     } catch (err) {
-
       console.log(err);
-
-      setError(
-        "Gagal terhubung ke server"
-      );
-
+      setError("Gagal terhubung ke server El-Coffee");
     } finally {
-
       setLoading(false);
     }
   };
 
   return (
-    <AuthCard
-      title="Welcome Back"
-      subtitle="Login to your Coffee Shop dashboard"
-    >
+    <div className="fixed inset-0 w-screen h-screen bg-[#FAF7F2] flex items-center justify-center p-4 overflow-hidden font-sans z-[9999]">
+      {/* Background soft blur decoration */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#EEDFCE]/40 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-      {/* ERROR */}
-      {error && (
-        <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl px-4 py-3 mb-5 text-sm">
-          <AlertCircle className="size-5" />
-          {error}
-        </div>
-      )}
-
-      {/* LOADING */}
-      {loading && (
-        <div className="flex items-center gap-3 bg-[#FFF7ED] border border-[#F4E1C8] text-[#A16207] rounded-2xl px-4 py-3 mb-5 text-sm">
-          <Loader2 className="size-5 animate-spin" />
-          Brewing your coffee...
-        </div>
-      )}
-
-      {/* FORM */}
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5"
-      >
-
-      <AuthInput
-        label="Email Address"
-        icon={<Mail />}
-        type="email"
-        name="email"
-        placeholder="you@example.com"
-        value={dataForm.email}
-        onChange={handleChange}
-      />
-
-      <AuthInput
-        label="Password"
-        icon={<Lock />}
-        type="password"
-        name="password"
-        placeholder="••••••••"
-        value={dataForm.password}
-        onChange={handleChange}
-      />
-
-        {/* FORGOT */}
-        <div className="flex justify-end">
-          <Link
-            to="/forgot"
-            className="text-sm text-[#D97706] hover:text-[#B45309] font-medium transition-all"
-          >
-            Forgot Password?
-          </Link>
+      {/* SATU-SATUNYA CARD YANG AKTIF (Menghilangkan total card luar) */}
+      <div className="w-full max-w-[420px] bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl shadow-amber-900/5 z-50">
+        
+        {/* BRANDING LOGO & JUDUL */}
+        <div className="flex flex-col items-center justify-center text-center mb-8">
+          <div className="w-12 h-12 bg-[#3D2517] rounded-2xl flex items-center justify-center shadow-md text-[#EEDFCE] mb-3">
+            <Coffee className="size-6" />
+          </div>
+          <h2 className="text-3xl font-serif font-bold text-[#3D2517] tracking-wide">
+            El-Coffee
+          </h2>
+          <p className="text-[10px] text-gray-400 font-semibold mt-1.5 uppercase tracking-widest">
+            Sign In to Your Dashboard
+          </p>
         </div>
 
-        {/* BUTTON */}
-        <Button
-          type="submit"
-          disabled={loading}
-          className="w-full"
-        >
-          {loading
-            ? "Loading..."
-            : "Login"}
-        </Button>
+        {/* NOTIFIKASI ERROR */}
+        {error && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200/50 text-red-700 rounded-xl px-4 py-3 mb-5 text-xs font-medium animate-pulse">
+            <AlertCircle className="size-4 shrink-0" />
+            <p>{error}</p>
+          </div>
+        )}
 
-      </form>
+        {/* NOTIFIKASI LOADING */}
+        {loading && (
+          <div className="flex items-center gap-3 bg-[#FFF7ED] border border-[#F4E1C8]/60 text-[#A16207] rounded-xl px-4 py-3 mb-5 text-xs font-medium">
+            <Loader2 className="size-4 animate-spin shrink-0" />
+            Brewing your session...
+          </div>
+        )}
 
-      {/* FOOTER */}
-      <div className="mt-8 text-center">
+        {/* FORM ISIAN */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <AuthInput
+            label="Email Address"
+            icon={<Mail className="size-4 text-gray-400" />}
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            value={dataForm.email}
+            onChange={handleChange}
+            required
+          />
 
-        <p className="text-sm text-[#A16207]">
-          Don't have an account?{" "}
+          <AuthInput
+            label="Password"
+            icon={<Lock className="size-4 text-gray-400" />}
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={dataForm.password}
+            onChange={handleChange}
+            required
+          />
 
-          <Link
-            to="/register"
-            className="text-[#D97706] font-semibold hover:underline"
-          >
-            Register
-          </Link>
+          {/* LINK LUPA PASSWORD */}
+          <div className="flex justify-end pt-0.5">
+            <Link
+              to="/forgot"
+              className="text-xs text-[#D97706] hover:text-[#B45309] font-semibold transition-colors hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
 
-        </p>
+          {/* TOMBOL SIGN IN */}
+          <div className="pt-2">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm tracking-wide"
+            >
+              {loading ? "Loading..." : "Sign In"}
+            </Button>
+          </div>
+        </form>
+
+        {/* PERPINDAHAN LINK KE REGISTRASI */}
+        <div className="mt-8 pt-4 border-t border-gray-100 text-center">
+          <p className="text-xs text-gray-400 font-medium">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-[#D97706] font-bold hover:text-[#B45309] transition-colors ml-1 hover:underline"
+            >
+              Register Here
+            </Link>
+          </p>
+        </div>
 
       </div>
-
-    </AuthCard>
+    </div>
   );
 }

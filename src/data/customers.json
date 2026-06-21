@@ -12,7 +12,8 @@
     "favoriteMenu": "Caramel Latte",
     "memberStatus": "Active",
     "lastOrder": "2026-05-10",
-    "notes": "Sering order iced coffee saat weekend"
+    "notes": "Sering order iced coffee saat weekend",
+    "review": "Caramel Latte di El-Coffee selalu jadi favorit saya. Pelayanannya cepat dan program membershipnya sangat menguntungkan."
   },
   {
     "customerId": "CUST-1002",
@@ -27,7 +28,8 @@
     "favoriteMenu": "Americano",
     "memberStatus": "Active",
     "lastOrder": "2026-05-09",
-    "notes": "Sering takeaway pagi"
+    "notes": "Sering takeaway pagi",
+    "review": "Americano-nya mantap, bikin melek buat kerja pagi. Proses takeaway juga kilat, ga pake antre lama."
   },
   {
     "customerId": "CUST-1003",
@@ -42,7 +44,8 @@
     "favoriteMenu": "Matcha Latte",
     "memberStatus": "Inactive",
     "lastOrder": "2026-05-02",
-    "notes": "Jarang datang weekday"
+    "notes": "Jarang datang weekday",
+    "review": "Matcha Latte-nya enak banget, ga terlalu manis. Sayang cuma sempat mampir kalau libur aja."
   },
   {
     "customerId": "CUST-1004",
@@ -57,7 +60,8 @@
     "favoriteMenu": "Vanilla Latte",
     "memberStatus": "Active",
     "lastOrder": "2026-05-10",
-    "notes": "Suka dessert menu"
+    "notes": "Suka dessert menu",
+    "review": "Kombinasi Vanilla Latte hangat dan croissant mereka bener-bener juara. Tempat langganan healing!"
   },
   {
     "customerId": "CUST-1005",
@@ -72,7 +76,8 @@
     "favoriteMenu": "Espresso",
     "memberStatus": "Active",
     "lastOrder": "2026-05-08",
-    "notes": "Sering dine in malam"
+    "notes": "Sering dine in malam",
+    "review": "Suasana kafe kalau malam tenang banget, cocok buat menyendiri sambil nikmatin Espresso yang bold."
   },
   {
     "customerId": "CUST-1006",
@@ -87,7 +92,8 @@
     "favoriteMenu": "Cappuccino",
     "memberStatus": "Active",
     "lastOrder": "2026-05-03",
-    "notes": "Biasanya order via online"
+    "notes": "Biasanya order via online",
+    "review": "Sering order Cappuccino via ojol, packing-nya aman banget jadi pas sampai rumah foam-nya masih bagus."
   },
   {
     "customerId": "CUST-1007",
@@ -102,7 +108,8 @@
     "favoriteMenu": "Hazelnut Latte",
     "memberStatus": "VIP",
     "lastOrder": "2026-05-10",
-    "notes": "Customer loyal hampir tiap hari"
+    "notes": "Customer loyal hampir tiap hari",
+    "review": "Udah kayak rumah kedua. Hazelnut Latte-nya ga pernah gagal nemenin produktivitas harian saya."
   },
   {
     "customerId": "CUST-1008",
@@ -117,7 +124,8 @@
     "favoriteMenu": "Mocha",
     "memberStatus": "Active",
     "lastOrder": "2026-05-04",
-    "notes": "Sering meeting di cafe"
+    "notes": "Sering meeting di cafe",
+    "review": "Wi-Fi kencang, banyak colokan, dan Mocha-nya enak. Tempat paling recommended buat ketemu klien."
   },
   {
     "customerId": "CUST-1009",
@@ -132,7 +140,8 @@
     "favoriteMenu": "Iced Latte",
     "memberStatus": "Active",
     "lastOrder": "2026-05-05",
-    "notes": "Suka minuman dingin"
+    "notes": "Suka minuman dingin",
+    "review": "Iced Latte-nya segar dan creamy-nya pas. Pas banget diminum siang-siang pas cuaca lagi gerah."
   },
   {
     "customerId": "CUST-1010",
@@ -147,7 +156,8 @@
     "favoriteMenu": "Flat White",
     "memberStatus": "VIP",
     "lastOrder": "2026-05-05",
-    "notes": "Pelanggan tetap pagi hari"
+    "notes": "Pelanggan tetap pagi hari",
+    "review": "Baristanya ramah-ramah, bahkan udah hafal pesanan Flat White saya tiap pagi. Service-nya top tier."
   },
   {
     "customerId": "CUST-1011",
@@ -162,7 +172,8 @@
     "favoriteMenu": "Affogato",
     "memberStatus": "Active",
     "lastOrder": "2026-05-11",
-    "notes": "Suka menu kopi plus es krim"
+    "notes": "Suka menu kopi plus es krim",
+    "review": "Perpaduan espresso pahit dan es krim vanilla di menu Affogato-nya benar-benar mood booster!"
   },
   {
     "customerId": "CUST-1012",
@@ -177,7 +188,8 @@
     "favoriteMenu": "Iced Lemon Tea",
     "memberStatus": "Active",
     "lastOrder": "2026-05-01",
-    "notes": "Mahasiswa sering nugas"
+    "notes": "Mahasiswa sering nugas",
+    "review": "Tempat nugas paling cozy di Depok. Harga Iced Lemon Tea-nya bersahabat banget buat kantong mahasiswa."
   },
   {
     "customerId": "CUST-1013",
@@ -192,7 +204,8 @@
     "favoriteMenu": "V60 Gayo",
     "memberStatus": "Active",
     "lastOrder": "2026-05-12",
-    "notes": "Pecinta manual brew"
+    "notes": "Pecinta manual brew",
+    "review": "Beans V60 Gayo di sini roasting-nya pas banget, notes-nya keluar semua. Sangat direkomendasikan buat pecinta kopi hitam."
   },
   {
     "customerId": "CUST-1014",
@@ -207,7 +220,8 @@
     "favoriteMenu": "Piccolo",
     "memberStatus": "Active",
     "lastOrder": "2026-05-10",
-    "notes": "Hanya pesan kopi porsi kecil"
+    "notes": "Hanya pesan kopi porsi kecil",
+    "review": "Piccolo-nya mantap, takaran susu dan kopinya seimbang banget. Pas buat short break di tengah kesibukan."
   },
   {
     "customerId": "CUST-1015",
@@ -222,7 +236,8 @@
     "favoriteMenu": "Avocado Coffee",
     "memberStatus": "VIP",
     "lastOrder": "2026-05-12",
-    "notes": "Selalu pesan untuk tim kantor"
+    "notes": "Selalu pesan untuk tim kantor",
+    "review": "Seluruh tim kantor selalu nagih Avocado Coffee dari sini setiap kali ada acara. Rasa alpukat aslinya dapet banget."
   },
   {
     "customerId": "CUST-1016",
@@ -237,7 +252,8 @@
     "favoriteMenu": "Cold Brew",
     "memberStatus": "Active",
     "lastOrder": "2026-05-02",
-    "notes": "Wisatawan lokal"
+    "notes": "Wisatawan lokal",
+    "review": "Nemuin kafe ini pas liburan ke Bali, Cold Brew mereka bener-bener refreshing dan rasanya clean."
   },
   {
     "customerId": "CUST-1017",
@@ -252,7 +268,8 @@
     "favoriteMenu": "Red Velvet Latte",
     "memberStatus": "Active",
     "lastOrder": "2026-05-09",
-    "notes": "Suka non-coffee menu"
+    "notes": "Suka non-coffee menu",
+    "review": "Buat yang ga terlalu kuat ngopi, Red Velvet Latte di sini wajib dicoba. Manisnya pas gurih."
   },
   {
     "customerId": "CUST-1018",
@@ -267,7 +284,8 @@
     "favoriteMenu": "Double Espresso",
     "memberStatus": "Active",
     "lastOrder": "2026-05-12",
-    "notes": "Morning person, jam 7 sudah order"
+    "notes": "Morning person, jam 7 sudah order",
+    "review": "Satu-satunya kafe andalan yang konsisten menyajikan Double Espresso berkualitas di pagi buta sebelum ngantor."
   },
   {
     "customerId": "CUST-1019",
@@ -282,7 +300,8 @@
     "favoriteMenu": "Iced Lychee Tea",
     "memberStatus": "Active",
     "lastOrder": "2026-05-06",
-    "notes": "Sering pesan snack tambahan"
+    "notes": "Sering pesan snack tambahan",
+    "review": "Iced Lychee Tea dipadu sama french fries mereka bener-bener kombinasi ngemil sore yang sempurna."
   },
   {
     "customerId": "CUST-1020",
@@ -297,7 +316,8 @@
     "favoriteMenu": "Long Black",
     "memberStatus": "Active",
     "lastOrder": "2026-05-11",
-    "notes": "Suka kopi panas tanpa gula"
+    "notes": "Suka kopi panas tanpa gula",
+    "review": "Rasa Long Black-nya otentik banget, pahitnya pas dan ada sedikit fruity notes yang segar."
   },
   {
     "customerId": "CUST-1021",
@@ -312,7 +332,8 @@
     "favoriteMenu": "Dirty Chai Latte",
     "memberStatus": "VIP",
     "lastOrder": "2026-05-12",
-    "notes": "Ekspatriat, suka rempah-rempah"
+    "notes": "Ekspatriat, suka rempah-rempah",
+    "review": "The best Dirty Chai Latte in town! The spice blend is incredibly authentic, reminds me of home."
   },
   {
     "customerId": "CUST-1022",
@@ -327,7 +348,8 @@
     "favoriteMenu": "Hot Chocolate",
     "memberStatus": "Active",
     "lastOrder": "2026-05-04",
-    "notes": "Customer baru pas promo Valentine"
+    "notes": "Customer baru pas promo Valentine",
+    "review": "Kenal cafe ini dari promo Valentine, turns out Hot Chocolate-nya emang beneran premium dan kental."
   },
   {
     "customerId": "CUST-1023",
@@ -342,7 +364,8 @@
     "favoriteMenu": "Macchiato",
     "memberStatus": "Active",
     "lastOrder": "2026-05-10",
-    "notes": "Selalu minta extra shot"
+    "notes": "Selalu minta extra shot",
+    "review": "Macchiato ditambah extra shot di sini bener-bener nendang di lidah. Pelayanan ramah melayani custom order."
   },
   {
     "customerId": "CUST-1024",
@@ -357,7 +380,8 @@
     "favoriteMenu": "Irish Coffee",
     "memberStatus": "VIP",
     "lastOrder": "2026-05-12",
-    "notes": "Sering bawa klien bisnis"
+    "notes": "Sering bawa klien bisnis",
+    "review": "Ambience kafe sangat profesional dan berkelas. Menu Irish Coffee-nya selalu sukses bikin impresi bagus ke klien saya."
   },
   {
     "customerId": "CUST-1025",
@@ -372,7 +396,8 @@
     "favoriteMenu": "Tubruk Arabica",
     "memberStatus": "Active",
     "lastOrder": "2026-05-05",
-    "notes": "Pecinta kopi lokal tradisional"
+    "notes": "Pecinta kopi lokal tradisional",
+    "review": "Meskipun kafenya modern, tapi racikan kopi Tubruk Arabica-nya mantap banget, mempertahankan cita rasa lokal."
   },
   {
     "customerId": "CUST-1026",
@@ -387,7 +412,8 @@
     "favoriteMenu": "Cafe Mocha",
     "memberStatus": "Active",
     "lastOrder": "2026-05-08",
-    "notes": "Sering order lewat Grab/Gojek"
+    "notes": "Sering order lewat Grab/Gojek",
+    "review": "Langganan pesan Cafe Mocha lewat aplikasi online. Dinginnya awet, cokelat dan kopinya ngeblend dengan baik."
   },
   {
     "customerId": "CUST-1027",
@@ -402,7 +428,8 @@
     "favoriteMenu": "Flat White",
     "memberStatus": "Active",
     "lastOrder": "2026-05-11",
-    "notes": "Suka latte art yang unik"
+    "notes": "Suka latte art yang unik",
+    "review": "Selalu kagum sama kemampuan latte art para barista di sini. Flat White-nya tidak cuma cantik tampilannya tapi juga lezat."
   },
   {
     "customerId": "CUST-1028",
@@ -417,7 +444,8 @@
     "favoriteMenu": "Oatmilk Latte",
     "memberStatus": "Active",
     "lastOrder": "2026-05-10",
-    "notes": "Diet plant-based"
+    "notes": "Diet plant-based",
+    "review": "Seneng banget ada opsi Oatmilk Latte untuk alternatif dairy-free yang rasanya tetap enak dan gurih."
   },
   {
     "customerId": "CUST-1029",
@@ -432,7 +460,8 @@
     "favoriteMenu": "Ice Coffee Gula Aren",
     "memberStatus": "Active",
     "lastOrder": "2026-05-09",
-    "notes": "Suka promo bundling snack"
+    "notes": "Suka promo bundling snack",
+    "review": "Ice Coffee Gula Aren ditambah promo bundling snack-nya bener-bener penyelemat dompet di akhir bulan."
   },
   {
     "customerId": "CUST-1030",
@@ -447,6 +476,7 @@
     "favoriteMenu": "Rose Latte",
     "memberStatus": "VIP",
     "lastOrder": "2026-05-12",
-    "notes": "Customer paling loyal sejak cafe buka"
+    "notes": "Customer paling loyal sejak cafe buka",
+    "review": "Sudah coba semua menu, tapi Rose Latte tetap nomor satu. Terima kasih selalu memberikan pelayanan terbaik dari hari pertama buka!"
   }
 ]

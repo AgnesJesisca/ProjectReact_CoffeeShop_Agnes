@@ -8,6 +8,7 @@ import Card from "../../components/Card";
 import Badge from "../../components/Badge";
 import SearchBar from "../../components/SearchBar";
 import FilterSelect from "../../components/FilterSelect";
+import Table from "../../components/Table"; // Pastikan path import ini sudah benar
 
 import {
   Tabs,
@@ -52,19 +53,19 @@ export default function Menu() {
     name: "",
     category: "",
     price: "",
-    image: "",
+    image: "", // Tetap dipertahankan di state jika backend masih butuh rujukan skema data
     stock: "",
   });
 
   const searchRef = useRef(null);
 
-    useEffect(() => {
-      document.title = "Menu Management";
-    }, []);
+  useEffect(() => {
+    document.title = "Menu Management";
+  }, []);
 
-    useEffect(() => {
-      searchRef.current?.focus();
-    }, []);
+  useEffect(() => {
+    searchRef.current?.focus();
+  }, []);
 
   const filtered = menus.filter(
     (m) =>
@@ -123,21 +124,20 @@ export default function Menu() {
       name: menu.name,
       category: menu.category,
       price: menu.price,
-      image: menu.image,
+      image: menu.image || "",
       stock: menu.stock,
     });
 
     setShowForm(true);
   };
 
-  const categories =
-    activeTab === "all"
-      ? ["Coffee", "Non-Coffee", "Snack"]
-      : [activeTab];
+  // Judul kolom untuk komponen tabel kustom kamu
+  const tableHeaders = ["Menu Name", "Category", "Price", "Stock", "Status", "Actions"];
 
   return (
     <div className="flex-1 min-h-screen bg-[#F8F4EE]">
       <div className="p-6 space-y-6">
+        
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <PageHeader
@@ -160,7 +160,6 @@ export default function Menu() {
               <AccordionTrigger>
                 Menu Management Information
               </AccordionTrigger>
-
               <AccordionContent>
                 This page is used to add, edit, search, filter and delete
                 coffee shop menus.
@@ -228,9 +227,10 @@ export default function Menu() {
                 }
               />
 
+              {/* Form Input Image URL opsional tetap ada seandainya database butuh, bisa kamu hapus jika benar-benar tidak dipakai lagi */}
               <Input
                 className="md:col-span-2"
-                placeholder="Image URL"
+                placeholder="Image URL (Optional)"
                 value={newMenu.image}
                 onChange={(e) =>
                   setNewMenu({
@@ -241,18 +241,31 @@ export default function Menu() {
               />
             </div>
 
-            <Button variant="primary" onClick={addMenu}>
-              {editing ? "Update Menu" : "Submit"}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="primary" onClick={addMenu}>
+                {editing ? "Update Menu" : "Submit"}
+              </Button>
+              {editing && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setEditing(null);
+                    setShowForm(false);
+                    setNewMenu({ name: "", category: "", price: "", image: "", stock: "" });
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
           </Card>
         )}
 
-        {/* FILTER */}
+        {/* FILTER & TABS */}
         <div className="flex gap-4">
           <SearchBar
-             ref={searchRef}
+            ref={searchRef}
             placeholder="Search menu..."
-
             className="w-full max-w-sm"
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -284,117 +297,100 @@ export default function Menu() {
           </TabsList>
         </Tabs>
 
-        {/* CATEGORY */}
-        {categories.map((category) => {
-          const categoryItems = filtered.filter(
-            (m) => m.category === category
-          );
-
-          if (categoryItems.length === 0) return null;
-
-          return (
-            <div key={category}>
-              <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-                {category}
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {categoryItems.map((m) => (
-                  <Card
-                    key={m.menuId}
-                    className="overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300 p-0"
-                  >
-                    {/* IMAGE */}
-                    <img
-                      src={m.image}
-                      className="w-full h-52 object-cover"
-                      alt={m.name}
-                    />
-
-                    <div className="p-6">
-                      {/* TOP */}
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Coffee className="size-4 text-[#D97706]" />
-                            <p className="text-[13px] text-[#A16207]">
-                              {m.category}
-                            </p>
-                          </div>
-
-                          <h3 className="text-[20px] font-semibold text-[#5B2E0F] mt-2">
-                            {m.name}
-                          </h3>
-                        </div>
-
-                        <Badge color={m.stock < 5 ? "red" : "green"}>
-                          {m.stock < 5 ? "Low Stock" : "Available"}
-                        </Badge>
-                      </div>
-
-                      {/* PRICE */}
-                      <div className="mt-5">
-                        <h1 className="text-[28px] font-bold text-[#5B2E0F]">
-                          Rp {m.price.toLocaleString("id-ID")}
-                        </h1>
-                        <p className="text-[13px] text-[#A16207] mt-1">
-                          Stock: {m.stock}
-                        </p>
-                      </div>
-
-                      {/* ACTION */}
-                      <div className="flex gap-3 mt-6">
-                        <Button
-                          variant="outline"
-                          className="flex-1 h-[45px]"
-                          onClick={() => editMenu(m)}
-                        >
-                          <Pencil className="size-4" />
-                        </Button>
-
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="danger"
-                              className="flex-1 h-[45px] text-red-600 hover:bg-red-50"
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                            
-                          </AlertDialogTrigger>
-
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Delete Menu?
-                              </AlertDialogTitle>
-                            </AlertDialogHeader>
-
-                            <p>
-                              Are you sure you want to delete this menu
-                              item?
-                            </p>
-
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>
-                                Cancel
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => deleteMenu(m.menuId)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+        {/* CONTAINER UTAMA BERBENTUK TABEL */}
+        <Card className="p-2 overflow-hidden">
+          {filtered.length === 0 ? (
+            <div className="p-8 text-center text-gray-400 text-sm">
+              No menu items found.
             </div>
-          );
-        })}
+          ) : (
+            <Table headers={tableHeaders}>
+              {filtered.map((m) => (
+                <tr 
+                  key={m.menuId} 
+                  className="border-b border-[#F1DFC8]/40 hover:bg-[#FDFBF7] transition-colors"
+                >
+                  {/* Nama Menu */}
+                  <td className="py-4 text-sm font-semibold text-[#5B2E0F]">
+                    <div className="flex items-center gap-2">
+                      <Coffee className="size-4 text-[#D97706] shrink-0" />
+                      <span>{m.name}</span>
+                    </div>
+                  </td>
+
+                  {/* Kategori */}
+                  <td className="py-4 text-sm text-[#A16207]">
+                    {m.category}
+                  </td>
+
+                  {/* Harga */}
+                  <td className="py-4 text-sm font-bold text-[#5B2E0F]">
+                    Rp {m.price.toLocaleString("id-ID")}
+                  </td>
+
+                  {/* Stok */}
+                  <td className="py-4 text-sm text-gray-600">
+                    {m.stock}
+                  </td>
+
+                  {/* Status Badge */}
+                  <td className="py-4 text-sm">
+                    <Badge color={m.stock < 5 ? "red" : "green"}>
+                      {m.stock < 5 ? "Low Stock" : "Available"}
+                    </Badge>
+                  </td>
+
+                  {/* Tombol Aksi */}
+                  <td className="py-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      {/* BUTTON EDIT (PENCIL) */}
+                      <button
+                        type="button"
+                        onClick={() => editMenu(m)}
+                        className="p-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-xl transition-all duration-200 border border-amber-200/60 flex items-center justify-center size-9 shadow-sm"
+                        title="Edit Menu"
+                      >
+                        <Pencil className="size-4" />
+                      </button>
+
+                      {/* BUTTON DELETE (TRASH) */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all duration-200 border border-red-200/60 flex items-center justify-center size-9 shadow-sm"
+                            title="Delete Menu"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Menu?</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <p className="text-sm text-gray-600">
+                            Are you sure you want to delete <strong>{m.name}</strong> from the menu list? This action cannot be undone.
+                          </p>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteMenu(m.menuId)}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </Table>
+          )}
+        </Card>
+
       </div>
     </div>
   );

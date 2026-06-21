@@ -2,18 +2,22 @@ import { useEffect, useState } from "react";
 import PageHeader from "../../components/PageHeader";
 import { usersAPI } from "../../services/usersAPI";
 import { AiFillDelete, AiFillEdit, AiOutlineClose } from "react-icons/ai";
+import { FiUsers, FiShield, FiUser } from "react-icons/fi"; // Tambahan icon biar makin cantik
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
+  
+  // State baru untuk memfilter tampilan berdasarkan Role
+  const [activeFilter, setActiveFilter] = useState("All"); 
 
   const [dataForm, setDataForm] = useState({
     username: "",
     email: "",
     password: "",
-    role: "",
+    role: "customer", // Default diset ke customer agar aman
   });
 
   useEffect(() => {
@@ -67,7 +71,7 @@ export default function UserManagement() {
       username: user.username,
       email: user.email,
       password: "", 
-      role: user.role,
+      role: user.role.toLowerCase(), // Amankan case-sensitivity
     });
   };
 
@@ -90,19 +94,25 @@ export default function UserManagement() {
       username: "",
       email: "",
       password: "",
-      role: "",
+      role: "customer",
     });
   };
 
+  // Logika Filter Data User berdasarkan Role aktif
+  const filteredUsers = users.filter((user) => {
+    if (activeFilter === "All") return true;
+    return user.role?.toLowerCase() === activeFilter.toLowerCase();
+  });
+
   return (
-    <div className="p-8">
+    <div className="p-8 bg-[#F8F4EE] min-h-screen">
       <PageHeader title="User Management" breadcrumb="Manage Registered Users" />
 
       {/* FORM */}
-      <div className="bg-white rounded-3xl shadow-lg p-6 mt-6">
+      <div className="bg-white rounded-3xl shadow-sm border border-[#F5E7D4] p-6 mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">
-            {editingId ? "Edit User" : "Tambah User"}
+          <h2 className="text-xl font-bold text-[#5B2E0F]">
+            {editingId ? "Edit User Profil" : "Tambah User Baru"}
           </h2>
           {editingId && (
             <button onClick={resetForm} className="flex items-center gap-1 text-sm text-red-500 hover:underline">
@@ -118,7 +128,7 @@ export default function UserManagement() {
             placeholder="Username"
             value={dataForm.username}
             onChange={handleChange}
-            className="border rounded-xl p-3 w-full"
+            className="border border-[#F5E7D4] rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
           <input
@@ -127,7 +137,7 @@ export default function UserManagement() {
             placeholder="Email"
             value={dataForm.email}
             onChange={handleChange}
-            className="border rounded-xl p-3 w-full"
+            className="border border-[#F5E7D4] rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
           <input
@@ -136,74 +146,122 @@ export default function UserManagement() {
             placeholder={editingId ? "Kosongkan jika tidak ingin mengubah password" : "Password"}
             value={dataForm.password}
             onChange={handleChange}
-            className="border rounded-xl p-3 w-full"
+            className="border border-[#F5E7D4] rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
             required={!editingId}
           />
-          <input
-            type="text"
+          
+          {/* Mengubah input teks role menjadi Select Dropdown agar data konsisten */}
+          <select
             name="role"
-            placeholder="Role"
             value={dataForm.role}
             onChange={handleChange}
-            className="border rounded-xl p-3 w-full"
+            className="border border-[#F5E7D4] rounded-xl p-3 w-full bg-white text-[#5B2E0F] focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
-          />
+          >
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
+
           <button
             type="submit"
             disabled={loading}
-            className="col-span-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white py-3 rounded-xl transition"
+            className="col-span-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white py-3 rounded-xl font-semibold transition shadow-md"
           >
             {loading ? "Menyimpan..." : editingId ? "Update User" : "Tambah User"}
           </button>
         </form>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-3xl shadow-lg mt-6 overflow-hidden">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-bold">Registered Users</h2>
-          <p className="text-gray-500 mt-1">Total Users : {users.length}</p>
+      {/* FILTER TABS & TABLE CONTAINER */}
+      <div className="bg-white rounded-3xl shadow-sm border border-[#F5E7D4] mt-6 overflow-hidden">
+        <div className="p-6 border-b border-[#F5E7D4] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-[#5B2E0F]">Registered Users</h2>
+            <p className="text-gray-500 text-sm mt-1">Total Entri: {filteredUsers.length} User</p>
+          </div>
+          
+          {/* TAB FILTER ROLE */}
+          <div className="flex bg-[#F8F4EE] p-1 rounded-xl border border-[#F5E7D4]">
+            <button
+              onClick={() => setActiveFilter("All")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
+                activeFilter === "All" ? "bg-orange-500 text-white shadow-sm" : "text-[#6B4F3A] hover:bg-amber-50"
+              }`}
+            >
+              <FiUsers /> Semua
+            </button>
+            <button
+              onClick={() => setActiveFilter("admin")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
+                activeFilter === "admin" ? "bg-red-500 text-white shadow-sm" : "text-[#6B4F3A] hover:bg-amber-50"
+              }`}
+            >
+              <FiShield /> Admin
+            </button>
+            <button
+              onClick={() => setActiveFilter("customer")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
+                activeFilter === "customer" ? "bg-blue-500 text-white shadow-sm" : "text-[#6B4F3A] hover:bg-amber-50"
+              }`}
+            >
+              <FiUser /> Customer
+            </button>
+          </div>
         </div>
 
-        {loading && <div className="p-6 text-center">Loading data...</div>}
+        {loading && <div className="p-6 text-center text-gray-500">Loading data...</div>}
         {error && <div className="p-6 text-red-500 text-center">{error}</div>}
 
         {!loading && !error && (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-100 border-b">
-                  <th className="p-4 text-center w-16">No</th>
-                  <th className="p-4">Username</th>
-                  <th className="p-4">Email</th>
-                  <th className="p-4">Role</th>
-                  <th className="p-4 text-center w-32">Action</th>
+                <tr className="bg-[#FFFBF6] border-b border-[#F5E7D4]">
+                  <th className="p-4 text-center w-16 text-[#5B2E0F] font-bold">No</th>
+                  <th className="p-4 text-[#5B2E0F] font-bold">Username</th>
+                  <th className="p-4 text-[#5B2E0F] font-bold">Email</th>
+                  <th className="p-4 text-[#5B2E0F] font-bold">Role</th>
+                  <th className="p-4 text-center w-32 text-[#5B2E0F] font-bold">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {users.length === 0 ? (
+                {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="p-6 text-center text-gray-500">Belum ada data user.</td>
+                    <td colSpan="5" className="p-6 text-center text-gray-400 italic">
+                      Tidak ada data user dengan role "{activeFilter}".
+                    </td>
                   </tr>
                 ) : (
-                  users.map((user, index) => (
-                    <tr key={user.id || index} className="border-b hover:bg-gray-50">
-                      <td className="p-4 text-center">{index + 1}</td>
-                      <td className="p-4">{user.username}</td>
-                      <td className="p-4">{user.email}</td>
-                      <td className="p-4">
-                        <span className="px-3 py-1 bg-gray-200 text-gray-800 text-sm rounded-full">{user.role}</span>
-                      </td>
-                      <td className="p-4 flex justify-center gap-4">
-                        <button onClick={() => handleEdit(user)}>
-                          <AiFillEdit className="text-blue-500 hover:text-blue-700 text-2xl transition" />
-                        </button>
-                        <button onClick={() => handleDelete(user.id)}>
-                          <AiFillDelete className="text-red-500 hover:text-red-700 text-2xl transition" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  filteredUsers.map((user, index) => {
+                    const isAdmin = user.role?.toLowerCase() === "admin";
+                    return (
+                      <tr key={user.id || index} className="border-b border-[#F5E7D4]/60 hover:bg-[#FFFBF6]/50 transition-colors">
+                        <td className="p-4 text-center text-gray-600 font-medium">{index + 1}</td>
+                        <td className="p-4 font-semibold text-[#5B2E0F]">{user.username}</td>
+                        <td className="p-4 text-gray-600">{user.email}</td>
+                        <td className="p-4">
+                          {/* Badge Pembeda Warna Admin & Customer */}
+                          <span
+                            className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
+                              isAdmin
+                                ? "bg-red-50 text-red-600 border border-red-200"
+                                : "bg-blue-50 text-blue-600 border border-blue-200"
+                            }`}
+                          >
+                            {user.role}
+                          </span>
+                        </td>
+                        <td className="p-4 flex justify-center gap-4">
+                          <button onClick={() => handleEdit(user)} title="Edit User">
+                            <AiFillEdit className="text-blue-500 hover:text-blue-700 text-2xl transition" />
+                          </button>
+                          <button onClick={() => handleDelete(user.id)} title="Hapus User">
+                            <AiFillDelete className="text-red-500 hover:text-red-700 text-2xl transition" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
