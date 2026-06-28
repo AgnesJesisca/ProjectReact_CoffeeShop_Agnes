@@ -40,10 +40,15 @@ export default function Register() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: "Customer",
-        loyalty: "Bronze", // Otomatis terdaftar sebagai Customer / Member biasa
+        role: "customer",          // lowercase konsisten dengan pengecekan di Login
+        loyalty: "Bronze",
+        memberStatus: "Active",
+        points: 0,
+        totalOrders: 0,
+        totalSpent: 0,
       });
 
+      // Jangan login otomatis — arahkan ke halaman Login
       navigate("/login");
     } catch (err) {
       console.log(err);

@@ -38,11 +38,16 @@ export default function Login() {
         return;
       }
 
+      // Simpan session lengkap — pastikan role ikut tersimpan
       localStorage.setItem("user", JSON.stringify(user));
 
-      if (user.role === "Admin") {
+      // Bandingkan role case-insensitive agar "Admin", "admin", "ADMIN" semua cocok
+      const role = user.role?.toLowerCase();
+
+      if (role === "admin") {
         navigate("/admin/dashboard");
       } else {
+        // Customer, customer, CUSTOMER → semua ke halaman member
         navigate("/member");
       }
     } catch (err) {

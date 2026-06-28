@@ -96,7 +96,7 @@ export default function MemberDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/"); // Kembali ke Landing Page, bukan ke Login
   };
 
   const handleRedeem = (reward) => {

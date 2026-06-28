@@ -15,7 +15,7 @@ const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 const Forgot = lazy(() => import("./pages/auth/Forgot"));
 
-// MEMBER (HALAMAN BARU)
+// MEMBER
 const MemberDashboard = lazy(() => import("./pages/member/MemberDashboard"));
 
 // MAIN (ADMIN)
@@ -33,12 +33,39 @@ const Reviews = lazy(() => import("./pages/main/Reviews"));
 // COMPONENT
 const Loading = lazy(() => import("./components/Loading"));
 
+// Guard khusus untuk halaman Member (/member)
+// Hanya boleh diakses jika sudah login (role apapun)
+// Jika belum login → /login
+// Jika sudah login sebagai admin → /admin/dashboard (admin tidak perlu ke /member)
+function MemberRoute({ children }) {
+  const savedUser = localStorage.getItem("user");
+
+  if (!savedUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  let user;
+  try {
+    user = JSON.parse(savedUser);
+  } catch {
+    localStorage.removeItem("user");
+    return <Navigate to="/login" replace />;
+  }
+
+  // Admin yang nyasar ke /member → kembalikan ke dashboard admin
+  if (user.role?.toLowerCase() === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
 
-        {/* GUEST / CUSTOMER UMUM */}
+        {/* GUEST — Landing Page */}
         <Route path="/" element={<Home />} />
 
         {/* AUTH */}
@@ -48,16 +75,18 @@ function App() {
           <Route path="/forgot" element={<Forgot />} />
         </Route>
 
-        {/* HALAMAN MEMBER (Hanya bisa diakses jika sudah login) */}
-        <Route 
-          path="/member" 
+        {/* MEMBER — hanya untuk customer yang sudah login */}
+        <Route
+          path="/member"
           element={
-            localStorage.getItem("user") ? <MemberDashboard /> : <Navigate to="/login" />
-          } 
+            <MemberRoute>
+              <MemberDashboard />
+            </MemberRoute>
+          }
         />
 
-        {/* ADMIN AREA (URL akan menjadi /admin/dashboard, /admin/orders, dll) */}
-        <Route 
+        {/* ADMIN AREA — hanya untuk role admin */}
+        <Route
           path="/admin"
           element={
             <ProtectedRoute>
@@ -65,7 +94,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Sub-route tanpa menggunakan tanda / di depannya */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="orders" element={<Orders />} />
           <Route path="orders/:id" element={<OrderDetail />} />
@@ -76,14 +104,13 @@ function App() {
           <Route path="users" element={<UserManagement />} />
           <Route path="reviews" element={<Reviews />} />
 
-          {/* Error & Fallback Routes khusus di dalam layout Admin */}
           <Route path="400" element={<ErrorPage code="400" message="Bad Request" />} />
           <Route path="401" element={<ErrorPage code="401" message="Unauthorized" />} />
           <Route path="403" element={<ErrorPage code="403" message="Forbidden" />} />
           <Route path="*" element={<ErrorPage code="404" message="It's look like you're lost" />} />
         </Route>
 
-        {/* Global Fallback jika ada user nyasar di luar rute admin */}
+        {/* Fallback global */}
         <Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>
