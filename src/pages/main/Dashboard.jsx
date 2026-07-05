@@ -1,7 +1,10 @@
+import { useState, useEffect } from "react";
+
+import { revenueAPI } from "../../services/revenueAPI";
+
 import PageHeader from "../../components/PageHeader";
 import DashboardCard from "../../components/DashboardCard";
 import ChartCard from "../../components/ChartCard";
-import revenue from "../../data/revenue.json";
 
 import {
   LineChart,
@@ -23,19 +26,46 @@ import {
 } from "react-icons/fa6";
 
 export default function Dashboard() {
+  const [revenue, setRevenue] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadRevenue();
+  }, []);
+
+  const loadRevenue = async () => {
+    try {
+      setLoading(true);
+      const data = await revenueAPI.fetchData();
+      setRevenue(data);
+    } catch (err) {
+      console.error("Gagal memuat data revenue:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 bg-[#FDFBF7] min-h-screen flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat dashboard...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 bg-[#FDFBF7] min-h-screen p-8 transition-all duration-300">
-      
+
       {/* HEADER */}
       <PageHeader
         title="Coffee Dashboard"
         breadcrumb="Overview of your coffee shop"
       />
 
-      {/* STATS CARDS (Updated to Warm Coffee & Earthy Palette) */}
+      {/* STATS CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
 
-        {/* Total Products - Cokelat Hangat */}
+        {/* Total Products */}
         <DashboardCard
           title="Total Products"
           value="156"
@@ -44,7 +74,7 @@ export default function Dashboard() {
           bgColor="bg-[#8B5E3C] shadow-md shadow-[#8B5E3C]/10 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
         />
 
-        {/* Daily Sales - Hijau Sage/Olive Teduh */}
+        {/* Daily Sales */}
         <DashboardCard
           title="Daily Sales"
           value="$2,450"
@@ -53,7 +83,7 @@ export default function Dashboard() {
           bgColor="bg-[#606C38] shadow-md shadow-[#606C38]/10 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
         />
 
-        {/* Purchases - Terakota / Oranye Hangat */}
+        {/* Purchases */}
         <DashboardCard
           title="Purchases"
           value="$1,250"
@@ -62,7 +92,7 @@ export default function Dashboard() {
           bgColor="bg-[#BC6C25] shadow-md shadow-[#BC6C25]/10 hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
         />
 
-        {/* Low Stock Items - Merah Bata Muted */}
+        {/* Low Stock Items */}
         <DashboardCard
           title="Low Stock Items"
           value="8"
@@ -84,58 +114,10 @@ export default function Dashboard() {
         >
           <div className="h-[280px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={revenue} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid
-                  strokeDasharray="5 5"
-                  stroke="#F4EAE1"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12, fill: "#A18276" }}
-                  axisLine={{ stroke: "#EADBC7" }}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: "#A18276" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "#FFFFFF", 
-                    borderRadius: "12px", 
-                    border: "1px solid #EADBC7",
-                    boxShadow: "0 4px 12px rgba(107, 36, 0, 0.05)"
-                  }} 
-                />
-                <Line
-                  type="monotone"
-                  dataKey="totalRevenue"
-                  stroke="#6B2400"
-                  strokeWidth={3.5}
-                  dot={{
-                    r: 5,
-                    fill: "#6B2400",
-                    stroke: "#FFFFFF",
-                    strokeWidth: 2,
-                  }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </ChartCard>
-
-        {/* BAR CHART CARD */}
-        <ChartCard
-          title="Daily Revenue"
-          description="Last 7 days performance"
-          className="shadow-sm border border-[#EADBC7]/40 hover:shadow-md transition-all duration-300"
-        >
-          <div className="h-[280px] mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={revenue} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <LineChart
+                data={revenue}
+                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+              >
                 <CartesianGrid
                   strokeDasharray="5 5"
                   stroke="#F4EAE1"
@@ -153,11 +135,60 @@ export default function Dashboard() {
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ 
-                    backgroundColor: "#FFFFFF", 
-                    borderRadius: "12px", 
+                  contentStyle={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "12px",
                     border: "1px solid #EADBC7",
-                    boxShadow: "0 4px 12px rgba(107, 36, 0, 0.05)"
+                    boxShadow: "0 4px 12px rgba(107, 36, 0, 0.05)",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="totalRevenue"
+                  stroke="#6B2400"
+                  strokeWidth={3.5}
+                  dot={{ r: 5, fill: "#6B2400", stroke: "#FFFFFF", strokeWidth: 2 }}
+                  activeDot={{ r: 7 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </ChartCard>
+
+        {/* BAR CHART CARD */}
+        <ChartCard
+          title="Daily Revenue"
+          description="Last 7 days performance"
+          className="shadow-sm border border-[#EADBC7]/40 hover:shadow-md transition-all duration-300"
+        >
+          <div className="h-[280px] mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={revenue}
+                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="5 5"
+                  stroke="#F4EAE1"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12, fill: "#A18276" }}
+                  axisLine={{ stroke: "#EADBC7" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#A18276" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "12px",
+                    border: "1px solid #EADBC7",
+                    boxShadow: "0 4px 12px rgba(107, 36, 0, 0.05)",
                   }}
                   cursor={{ fill: "#FDFBF7", opacity: 0.7 }}
                 />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-import customersData from "../../data/customers.json";
+import { customersAPI } from "../../services/customersAPI";
 
 import PageHeader from "../../components/PageHeader";
 import Button from "../../components/Button";
@@ -10,7 +10,7 @@ import Card from "../../components/Card";
 import Badge from "../../components/Badge";
 import SearchBar from "../../components/SearchBar";
 import FilterSelect from "../../components/FilterSelect";
-import Table from "../../components/Table"; // Pastikan import komponen tabel kustom sudah benar
+import Table from "../../components/Table";
 
 import {
   Plus,
@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 
 export default function Customers() {
-  const [customers, setCustomers] = useState(customersData);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -35,7 +36,20 @@ export default function Customers() {
 
   useEffect(() => {
     document.title = "Customers Management";
+    loadCustomers();
   }, []);
+
+  const loadCustomers = async () => {
+    try {
+      setLoading(true);
+      const data = await customersAPI.fetchData();
+      setCustomers(data);
+    } catch (err) {
+      console.error("Gagal memuat data customers:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // FILTER DATA
   const filtered = customers.filter(
@@ -47,15 +61,21 @@ export default function Customers() {
   );
 
   // SUBMIT NEW CUSTOMER
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newCustomer = {
       customerId: "CUST-" + Date.now(),
       ...form,
       totalOrders: 0,
       totalSpent: 0,
+      memberStatus: "Active",
     };
 
-    setCustomers([newCustomer, ...customers]);
+    try {
+      const created = await customersAPI.createData(newCustomer);
+      setCustomers([created, ...customers]);
+    } catch (err) {
+      console.error("Gagal menambah customer:", err);
+    }
 
     setForm({
       customerName: "",
@@ -67,8 +87,15 @@ export default function Customers() {
     setShowForm(false);
   };
 
-  // Judul kolom untuk komponen tabel kustom kamu
   const tableHeaders = ["Customer Info", "Phone", "Total Orders", "Total Spent", "Loyalty Status", "Actions"];
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#F8F4EE] flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat data customers...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 min-h-screen bg-[#F8F4EE]">
@@ -237,7 +264,7 @@ export default function Customers() {
 
                   {/* Tombol Tindakan */}
                   <td className="py-4 text-sm">
-                    <Link to={`/customers/${c.customerId}`}>
+                    <Link to={`/admin/customers/${c.customerId}`}>
                       <button
                         type="button"
                         className="px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-xs font-semibold transition-all duration-200 border border-amber-200/60 flex items-center gap-1.5 shadow-sm"

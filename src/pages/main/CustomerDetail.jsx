@@ -1,61 +1,80 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 
-import customers from "../../data/customers.json";
-import orders from "../../data/orders.json";
+import { customersAPI } from "../../services/customersAPI";
+import { ordersAPI } from "../../services/ordersAPI";
 
 import PageHeader from "../../components/PageHeader";
 import ErrorPage from "./ErrorPage";
-
 import Button from "../../components/Button";
 import Card from "../../components/Card";
 import Badge from "../../components/Badge";
 import Table from "../../components/Table";
 
 export default function CustomerDetail() {
-
   const { id } = useParams();
 
-  const customer = customers.find(
-    (c) => c.customerId === id
-  );
+  const [customer, setCustomer] = useState(null);
+  const [customerOrders, setCustomerOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!customer) {
+  useEffect(() => {
+    loadData();
+  }, [id]);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+
+      // Ambil data customer berdasarkan customerId dari URL param
+      const cust = await customersAPI.fetchById(id);
+      if (!cust) {
+        setNotFound(true);
+        return;
+      }
+      setCustomer(cust);
+
+      // Ambil semua order lalu filter berdasarkan nama customer
+      const allOrders = await ordersAPI.fetchData();
+      const firstName = cust.customerName.split(" ")[0].toLowerCase();
+      const filtered = allOrders.filter((o) =>
+        o.customer.toLowerCase().includes(firstName)
+      );
+      setCustomerOrders(filtered);
+    } catch (err) {
+      console.error("Gagal memuat detail customer:", err);
+      setNotFound(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <ErrorPage
-        code="404"
-        message="Customer Not Found"
-      />
+      <div className="flex-1 min-h-screen bg-[#F8F4EE] flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat detail customer...</p>
+      </div>
     );
   }
 
-  // CUSTOMER ORDERS
-  const customerOrders = orders.filter(
-    (o) =>
-      o.customer
-        .toLowerCase()
-        .includes(
-          customer.customerName
-            .split(" ")[0]
-            .toLowerCase()
-        )
-  );
+  if (notFound || !customer) {
+    return <ErrorPage code="404" message="Customer Not Found" />;
+  }
 
-  // TOTAL REVENUE
+  // TOTAL REVENUE dari order history
   const totalRevenue = customerOrders.reduce(
     (a, b) =>
       a +
       b.items.reduce(
-        (x, y) =>
-          x + y.qty * y.price,
+        (x, y) => x + y.qty * y.price,
         0
       ),
     0
   );
 
   return (
-
     <div className="flex-1 min-h-screen bg-[#F8F4EE]">
-
       <div className="p-6 space-y-6">
 
         {/* HEADER */}
@@ -63,15 +82,11 @@ export default function CustomerDetail() {
           title="Customer Detail"
           breadcrumb={`Dashboard / Customers / ${customer.customerName}`}
         >
-
-          <Link to="/customers">
-
+          <Link to="/admin/customers">
             <Button variant="secondary">
               Back
             </Button>
-
           </Link>
-
         </PageHeader>
 
         {/* PROFILE */}
@@ -79,9 +94,7 @@ export default function CustomerDetail() {
 
           {/* LEFT */}
           <Card>
-
             <div className="text-center">
-
               <div
                 className="
                 w-24 h-24
@@ -94,32 +107,17 @@ export default function CustomerDetail() {
                 text-[#D97706]
                 "
               >
-
                 {customer.customerName.charAt(0)}
-
               </div>
 
-              <h2
-                className="
-                text-[28px]
-                font-bold
-                text-[#5B2E0F]
-                mt-5
-                "
-              >
+              <h2 className="text-[28px] font-bold text-[#5B2E0F] mt-5">
                 {customer.customerName}
               </h2>
 
-              <p className="text-[#A16207] mt-2">
-                {customer.email}
-              </p>
-
-              <p className="text-[#A16207]">
-                {customer.phone}
-              </p>
+              <p className="text-[#A16207] mt-2">{customer.email}</p>
+              <p className="text-[#A16207]">{customer.phone}</p>
 
               <div className="mt-5">
-
                 <Badge
                   color={
                     customer.loyalty === "Gold"
@@ -131,286 +129,136 @@ export default function CustomerDetail() {
                 >
                   {customer.loyalty} Member
                 </Badge>
-
               </div>
-
             </div>
-
           </Card>
 
           {/* RIGHT */}
           <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
-
             <Card>
-
-              <p className="text-sm text-gray-500">
-                Total Orders
-              </p>
-
-              <h2
-                className="
-                text-[34px]
-                font-bold
-                text-[#5B2E0F]
-                mt-2
-                "
-              >
+              <p className="text-sm text-gray-500">Total Orders</p>
+              <h2 className="text-[34px] font-bold text-[#5B2E0F] mt-2">
                 {customer.totalOrders}
               </h2>
-
             </Card>
 
             <Card>
-
-              <p className="text-sm text-gray-500">
-                Total Spent
-              </p>
-
-              <h2
-                className="
-                text-[34px]
-                font-bold
-                text-[#5B2E0F]
-                mt-2
-                "
-              >
+              <p className="text-sm text-gray-500">Total Spent</p>
+              <h2 className="text-[34px] font-bold text-[#5B2E0F] mt-2">
                 Rp{" "}
-                {customer.totalSpent.toLocaleString(
-                  "id-ID"
-                )}
+                {customer.totalSpent.toLocaleString("id-ID")}
               </h2>
-
             </Card>
 
             <Card>
-
-              <p className="text-sm text-gray-500">
-                Favorite Menu
-              </p>
-
-              <h2
-                className="
-                text-[22px]
-                font-semibold
-                text-[#5B2E0F]
-                mt-2
-                "
-              >
+              <p className="text-sm text-gray-500">Favorite Menu</p>
+              <h2 className="text-[22px] font-semibold text-[#5B2E0F] mt-2">
                 {customer.favoriteMenu}
               </h2>
-
             </Card>
 
             <Card>
-
-              <p className="text-sm text-gray-500">
-                Member Status
-              </p>
-
-              <h2
-                className="
-                text-[22px]
-                font-semibold
-                text-[#5B2E0F]
-                mt-2
-                "
-              >
+              <p className="text-sm text-gray-500">Member Status</p>
+              <h2 className="text-[22px] font-semibold text-[#5B2E0F] mt-2">
                 {customer.memberStatus}
               </h2>
-
             </Card>
 
             <Card>
-
-              <p className="text-sm text-gray-500">
-                Join Date
-              </p>
-
-              <h2
-                className="
-                text-[22px]
-                font-semibold
-                text-[#5B2E0F]
-                mt-2
-                "
-              >
+              <p className="text-sm text-gray-500">Join Date</p>
+              <h2 className="text-[22px] font-semibold text-[#5B2E0F] mt-2">
                 {customer.joinDate}
               </h2>
-
             </Card>
 
             <Card>
-
-              <p className="text-sm text-gray-500">
-                Last Order
-              </p>
-
-              <h2
-                className="
-                text-[22px]
-                font-semibold
-                text-[#5B2E0F]
-                mt-2
-                "
-              >
+              <p className="text-sm text-gray-500">Last Order</p>
+              <h2 className="text-[22px] font-semibold text-[#5B2E0F] mt-2">
                 {customer.lastOrder}
               </h2>
-
             </Card>
-
           </div>
-
         </div>
 
         {/* NOTES */}
         <Card>
-
-          <p className="text-sm text-gray-500 mb-3">
-            Customer Notes
-          </p>
-
+          <p className="text-sm text-gray-500 mb-3">Customer Notes</p>
           <p className="text-[#6B4F3A] leading-relaxed">
             {customer.notes}
           </p>
-
         </Card>
 
         {/* ORDER HISTORY */}
         <Card>
-
           <div className="flex justify-between items-center mb-6">
-
             <div>
-
-              <h2
-                className="
-                text-[24px]
-                font-semibold
-                text-[#5B2E0F]
-                "
-              >
+              <h2 className="text-[24px] font-semibold text-[#5B2E0F]">
                 Order History
               </h2>
-
               <p className="text-sm text-[#A16207] mt-1">
                 Customer transaction history
               </p>
-
             </div>
 
             <div className="text-right">
-
-              <p className="text-sm text-gray-500">
-                Revenue
-              </p>
-
-              <h2
-                className="
-                text-[28px]
-                font-bold
-                text-[#5B2E0F]
-                "
-              >
+              <p className="text-sm text-gray-500">Revenue</p>
+              <h2 className="text-[28px] font-bold text-[#5B2E0F]">
                 Rp {totalRevenue.toLocaleString("id-ID")}
               </h2>
-
             </div>
-
           </div>
 
-          <Table
-            headers={[
-              "Order ID",
-              "Items",
-              "Payment",
-              "Status",
-              "Total",
-            ]}
-          >
-
-            {customerOrders.map((o) => (
-
-              <tr
-                key={o.orderId}
-                className="
-                border-t border-[#F5E7D4]
-                hover:bg-[#FFFBF6]
-                transition-all
-                "
-              >
-
-                {/* ORDER ID */}
-                <td className="p-5 font-medium text-[#5B2E0F]">
-                  {o.orderId}
-                </td>
-
-                {/* ITEMS */}
-                <td className="p-5 text-sm text-[#6B4F3A]">
-
-                  {o.items
-                    .map(
-                      (i) =>
-                        `${i.name} x${i.qty}`
-                    )
-                    .join(", ")}
-
-                </td>
-
-                {/* PAYMENT */}
-                <td className="p-5 text-center text-[#6B4F3A]">
-                  {o.paymentMethod}
-                </td>
-
-                {/* STATUS */}
-                <td className="p-5 text-center">
-
-                  <Badge
-                    color={
-                      o.status === "Completed"
-                        ? "green"
-                        : "yellow"
-                    }
-                  >
-                    {o.status}
-                  </Badge>
-
-                </td>
-
-                {/* TOTAL */}
-                <td
-                  className="
-                  p-5
-                  text-right
-                  font-semibold
-                  text-[#5B2E0F]
-                  "
+          {customerOrders.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6">
+              Belum ada riwayat order.
+            </p>
+          ) : (
+            <Table
+              headers={["Order ID", "Items", "Payment", "Status", "Total"]}
+            >
+              {customerOrders.map((o) => (
+                <tr
+                  key={o.orderId}
+                  className="border-t border-[#F5E7D4] hover:bg-[#FFFBF6] transition-all"
                 >
-                  Rp{" "}
+                  {/* ORDER ID */}
+                  <td className="p-5 font-medium text-[#5B2E0F]">
+                    {o.orderId}
+                  </td>
 
-                  {o.items
-                    .reduce(
-                      (a, b) =>
-                        a +
-                        b.qty * b.price,
-                      0
-                    )
-                    .toLocaleString(
-                      "id-ID"
-                    )}
+                  {/* ITEMS */}
+                  <td className="p-5 text-sm text-[#6B4F3A]">
+                    {o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}
+                  </td>
 
-                </td>
+                  {/* PAYMENT */}
+                  <td className="p-5 text-center text-[#6B4F3A]">
+                    {o.paymentMethod}
+                  </td>
 
-              </tr>
+                  {/* STATUS */}
+                  <td className="p-5 text-center">
+                    <Badge
+                      color={o.status === "Completed" ? "green" : "yellow"}
+                    >
+                      {o.status}
+                    </Badge>
+                  </td>
 
-            ))}
-
-          </Table>
-
+                  {/* TOTAL */}
+                  <td className="p-5 text-right font-semibold text-[#5B2E0F]">
+                    Rp{" "}
+                    {o.items
+                      .reduce((a, b) => a + b.qty * b.price, 0)
+                      .toLocaleString("id-ID")}
+                  </td>
+                </tr>
+              ))}
+            </Table>
+          )}
         </Card>
 
       </div>
-
     </div>
-
   );
 }

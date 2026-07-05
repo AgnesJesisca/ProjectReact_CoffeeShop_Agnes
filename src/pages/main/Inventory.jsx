@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import data from "../../data/inventory.json";
+import { inventoryAPI } from "../../services/inventoryAPI";
 
 import PageHeader from "../../components/PageHeader";
 import Button from "../../components/Button";
@@ -9,7 +9,7 @@ import Card from "../../components/Card";
 import Badge from "../../components/Badge";
 import SearchBar from "../../components/SearchBar";
 import Modal from "../../components/Modal";
-import Table from "../../components/Table"; // Pastikan import komponen Table kustom sudah benar
+import Table from "../../components/Table";
 
 import {
   Plus,
@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 
 export default function Inventory() {
-  const [items, setItems] = useState(data);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
 
@@ -37,15 +38,20 @@ export default function Inventory() {
 
   useEffect(() => {
     document.title = "Inventory Management";
+    loadInventory();
   }, []);
 
-  useEffect(() => {
-    console.log(searchRef.current);
-  }, []);
-
-  useEffect(() => {
-    console.log(`Jumlah item inventory: ${items.length}`);
-  }, [items]);
+  const loadInventory = async () => {
+    try {
+      setLoading(true);
+      const data = await inventoryAPI.fetchData();
+      setItems(data);
+    } catch (err) {
+      console.error("Gagal memuat data inventory:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // FILTER DATA
   const filtered = items.filter((i) =>
@@ -55,57 +61,66 @@ export default function Inventory() {
   const lowStockItems = items.filter((i) => i.stock < 5);
 
   // ADD ITEM
-  const handleAddItem = () => {
-    setItems([
-      ...items,
-      {
-        ...newItem,
-        itemId: Date.now(),
-        status: newItem.stock < 5 ? "Low" : "Normal",
-      },
-    ]);
+  const handleAddItem = async () => {
+    const payload = {
+      ...newItem,
+      itemId: "INV-" + Date.now(),
+      status: newItem.stock < 5 ? "Low" : "Normal",
+    };
+
+    try {
+      const created = await inventoryAPI.createData(payload);
+      setItems([...items, created]);
+    } catch (err) {
+      console.error("Gagal menambah item:", err);
+    }
 
     setShowForm(false);
-
-    setNewItem({
-      name: "",
-      category: "",
-      stock: 0,
-      unit: "",
-    });
+    setNewItem({ name: "", category: "", stock: 0, unit: "" });
   };
 
   // UPDATE STOCK
-  const handleUpdateStock = () => {
-    setItems(
-      items.map((item) => {
-        if (item.itemId === selected.itemId) {
-          const newStock =
-            selected.type === "add"
-              ? item.stock + qty
-              : item.stock - qty;
+  const handleUpdateStock = async () => {
+    const newStock =
+      selected.type === "add"
+        ? selected.stock + qty
+        : selected.stock - qty;
 
-          return {
-            ...item,
-            stock: newStock < 0 ? 0 : newStock,
-            status: newStock < 5 ? "Low" : "Normal",
-          };
-        }
-        return item;
-      })
-    );
+    const safeStock = newStock < 0 ? 0 : newStock;
+    const updatedStatus = safeStock < 5 ? "Low" : "Normal";
+
+    try {
+      const updated = await inventoryAPI.updateData(selected.itemId, {
+        stock: safeStock,
+        status: updatedStatus,
+      });
+      setItems(
+        items.map((item) =>
+          item.itemId === selected.itemId ? updated : item
+        )
+      );
+    } catch (err) {
+      console.error("Gagal update stok:", err);
+    }
 
     setSelected(null);
     setQty(0);
   };
 
-  // Judul kolom untuk tabel inventory
   const tableHeaders = ["Item Name", "Category", "Current Stock", "Status", "Actions"];
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#F8F4EE] flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat data inventory...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 min-h-screen bg-[#F8F4EE]">
       <div className="p-6 space-y-6">
-        
+
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <PageHeader
@@ -134,44 +149,29 @@ export default function Inventory() {
                 placeholder="Item Name"
                 value={newItem.name}
                 onChange={(e) =>
-                  setNewItem({
-                    ...newItem,
-                    name: e.target.value,
-                  })
+                  setNewItem({ ...newItem, name: e.target.value })
                 }
               />
-
               <Input
                 placeholder="Category"
                 value={newItem.category}
                 onChange={(e) =>
-                  setNewItem({
-                    ...newItem,
-                    category: e.target.value,
-                  })
+                  setNewItem({ ...newItem, category: e.target.value })
                 }
               />
-
               <Input
                 type="number"
                 placeholder="Stock"
                 value={newItem.stock || ""}
                 onChange={(e) =>
-                  setNewItem({
-                    ...newItem,
-                    stock: Number(e.target.value),
-                  })
+                  setNewItem({ ...newItem, stock: Number(e.target.value) })
                 }
               />
-
               <Input
                 placeholder="Unit (e.g., Kg, Pcs, Pack)"
                 value={newItem.unit}
                 onChange={(e) =>
-                  setNewItem({
-                    ...newItem,
-                    unit: e.target.value,
-                  })
+                  setNewItem({ ...newItem, unit: e.target.value })
                 }
               />
             </div>
@@ -232,7 +232,10 @@ export default function Inventory() {
 
                   {/* Jumlah Stok + Unit */}
                   <td className="py-4 text-sm font-mono font-bold text-gray-800">
-                    {i.stock} <span className="text-xs font-sans text-gray-400 font-normal ml-0.5">{i.unit}</span>
+                    {i.stock}{" "}
+                    <span className="text-xs font-sans text-gray-400 font-normal ml-0.5">
+                      {i.unit}
+                    </span>
                   </td>
 
                   {/* Status Badge */}
@@ -242,18 +245,13 @@ export default function Inventory() {
                     </Badge>
                   </td>
 
-                  {/* Tombol Aksi (+ Stok / Pakai Stok) */}
+                  {/* Tombol Aksi */}
                   <td className="py-4 text-sm">
                     <div className="flex items-center gap-2">
-                      {/* Tombol Tambah Stok */}
+                      {/* Tambah Stok */}
                       <button
                         type="button"
-                        onClick={() =>
-                          setSelected({
-                            ...i,
-                            type: "add",
-                          })
-                        }
+                        onClick={() => setSelected({ ...i, type: "add" })}
                         className="px-2.5 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition-all duration-200 border border-emerald-200/60 flex items-center gap-1 shadow-sm"
                         title="Restock Item"
                       >
@@ -261,19 +259,13 @@ export default function Inventory() {
                         <span>Add</span>
                       </button>
 
-                      {/* Tombol Pakai Stok */}
+                      {/* Pakai Stok */}
                       <button
                         type="button"
-                        onClick={() =>
-                          setSelected({
-                            ...i,
-                            type: "use",
-                          })
-                        }
+                        onClick={() => setSelected({ ...i, type: "use" })}
                         className="px-2.5 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-xs font-semibold transition-all duration-200 border border-amber-200/60 flex items-center gap-1 shadow-sm"
                         title="Use Stock"
                       >
-                        <MutableIcon type={i.status} />
                         <PackageMinus className="size-3.5" />
                         <span>Use</span>
                       </button>
@@ -319,9 +311,4 @@ export default function Inventory() {
       </div>
     </div>
   );
-}
-
-// Helper kosong mencegah crash if data kosong
-function MutableIcon({ type }) {
-  return null;
 }

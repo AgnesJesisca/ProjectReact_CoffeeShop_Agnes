@@ -1,18 +1,38 @@
-import { useState } from "react";
-import { MessageSquare, Star, User } from "lucide-react";
-import customersData from "../../data/customers.json"; // Mengambil data pelanggan langsung
+import { useState, useEffect } from "react";
+import { MessageSquare, User } from "lucide-react";
 
-import PageHeader from "../../components/PageHeader";
-import Card from "../../components/Card";
-import SearchBar from "../../components/SearchBar";
-import Badge from "../../components/Badge";
+import { customersAPI } from "../../services/customersAPI";
+
+import PageHeader       from "../../components/PageHeader";
+import Card             from "../../components/Card";
+import SearchBar        from "../../components/SearchBar";
+import Badge            from "../../components/Badge";
+import FilterSelect     from "../../components/FilterSelect";
 
 export default function Reviews() {
+  const [allCustomers, setAllCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterLoyalty, setFilterLoyalty] = useState("All");
 
+  useEffect(() => {
+    loadCustomers();
+  }, []);
+
+  const loadCustomers = async () => {
+    try {
+      setLoading(true);
+      const data = await customersAPI.fetchData();
+      setAllCustomers(data);
+    } catch (err) {
+      console.error("Gagal memuat data reviews:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Filter ulasan berdasarkan pencarian nama/menu favorit dan tier loyalty member
-  const filteredReviews = customersData.filter((cust) => {
+  const filteredReviews = allCustomers.filter((cust) => {
     // Memastikan hanya menampilkan customer yang memiliki review tertulis saja
     if (!cust.review) return false;
 
@@ -39,6 +59,14 @@ export default function Reviews() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#F8F4EE] flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat data reviews...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 min-h-screen bg-[#F8F4EE] p-6 space-y-6">
       <PageHeader
@@ -47,7 +75,7 @@ export default function Reviews() {
       />
 
       {/* FILTER & SEARCH */}
-      <Card className="bg-white border border-[#F5E7D4] p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <Card className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
         <SearchBar
           placeholder="Cari nama member atau menu favorit..."
           value={search}
@@ -58,17 +86,12 @@ export default function Reviews() {
           <span className="text-sm font-semibold text-[#5B2E0F] whitespace-nowrap">
             Tier Member:
           </span>
-          <select
+          <FilterSelect
             value={filterLoyalty}
+            options={["All", "Gold", "Silver", "Bronze", "VIP"]}
             onChange={(e) => setFilterLoyalty(e.target.value)}
-            className="w-full md:w-40 px-3 py-2 border border-[#F5E7D4] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#D46300] text-[#5B2E0F] font-medium bg-[#FFFBF6]"
-          >
-            <option value="All">Semua Tier</option>
-            <option value="Gold">Gold</option>
-            <option value="Silver">Silver</option>
-            <option value="Bronze">Bronze</option>
-            <option value="VIP">VIP</option>
-          </select>
+            className="w-full md:w-44"
+          />
         </div>
       </Card>
 

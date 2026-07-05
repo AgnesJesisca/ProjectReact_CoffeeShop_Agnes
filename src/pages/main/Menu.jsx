@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import menuData from "../../data/menu.json";
+
+import { menuAPI } from "../../services/menuAPI";
 
 import PageHeader from "../../components/PageHeader";
 import Button from "../../components/Button";
@@ -8,7 +9,7 @@ import Card from "../../components/Card";
 import Badge from "../../components/Badge";
 import SearchBar from "../../components/SearchBar";
 import FilterSelect from "../../components/FilterSelect";
-import Table from "../../components/Table"; // Pastikan path import ini sudah benar
+import Table from "../../components/Table";
 
 import {
   Tabs,
@@ -42,7 +43,8 @@ import {
 } from "lucide-react";
 
 export default function Menu() {
-  const [menus, setMenus] = useState(menuData);
+  const [menus, setMenus] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -53,7 +55,7 @@ export default function Menu() {
     name: "",
     category: "",
     price: "",
-    image: "", // Tetap dipertahankan di state jika backend masih butuh rujukan skema data
+    image: "",
     stock: "",
   });
 
@@ -61,11 +63,24 @@ export default function Menu() {
 
   useEffect(() => {
     document.title = "Menu Management";
+    loadMenus();
   }, []);
 
   useEffect(() => {
     searchRef.current?.focus();
   }, []);
+
+  const loadMenus = async () => {
+    try {
+      setLoading(true);
+      const data = await menuAPI.fetchData();
+      setMenus(data);
+    } catch (err) {
+      console.error("Gagal memuat data menu:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = menus.filter(
     (m) =>
@@ -77,49 +92,42 @@ export default function Menu() {
   );
 
   // ADD / UPDATE MENU
-  const addMenu = () => {
-    if (editing) {
-      setMenus(
-        menus.map((m) =>
-          m.menuId === editing.menuId
-            ? {
-                ...editing,
-                ...newMenu,
-              }
-            : m
-        )
-      );
-      setEditing(null);
-    } else {
-      setMenus([
-        ...menus,
-        {
+  const addMenu = async () => {
+    try {
+      if (editing) {
+        const updated = await menuAPI.updateData(editing.menuId, newMenu);
+        setMenus(menus.map((m) => (m.menuId === editing.menuId ? updated : m)));
+        setEditing(null);
+      } else {
+        const payload = {
           ...newMenu,
-          menuId: Date.now(),
-        },
-      ]);
+          menuId: "MENU-" + Date.now(),
+          isAvailable: true,
+        };
+        const created = await menuAPI.createData(payload);
+        setMenus([...menus, created]);
+      }
+    } catch (err) {
+      console.error("Gagal menyimpan menu:", err);
     }
 
     setShowForm(false);
-
-    setNewMenu({
-      name: "",
-      category: "",
-      price: "",
-      image: "",
-      stock: "",
-    });
-  }; 
+    setNewMenu({ name: "", category: "", price: "", image: "", stock: "" });
+  };
 
   // DELETE MENU
-  const deleteMenu = (id) => {
-    setMenus(menus.filter((m) => m.menuId !== id));
+  const deleteMenu = async (menuId) => {
+    try {
+      await menuAPI.deleteData(menuId);
+      setMenus(menus.filter((m) => m.menuId !== menuId));
+    } catch (err) {
+      console.error("Gagal menghapus menu:", err);
+    }
   };
 
   // EDIT MENU
   const editMenu = (menu) => {
     setEditing(menu);
-
     setNewMenu({
       name: menu.name,
       category: menu.category,
@@ -127,17 +135,23 @@ export default function Menu() {
       image: menu.image || "",
       stock: menu.stock,
     });
-
     setShowForm(true);
   };
 
-  // Judul kolom untuk komponen tabel kustom kamu
   const tableHeaders = ["Menu Name", "Category", "Price", "Stock", "Status", "Actions"];
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#F8F4EE] flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat data menu...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 min-h-screen bg-[#F8F4EE]">
       <div className="p-6 space-y-6">
-        
+
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <PageHeader
@@ -180,26 +194,15 @@ export default function Menu() {
                 placeholder="Menu Name"
                 value={newMenu.name}
                 onChange={(e) =>
-                  setNewMenu({
-                    ...newMenu,
-                    name: e.target.value,
-                  })
+                  setNewMenu({ ...newMenu, name: e.target.value })
                 }
               />
 
               <FilterSelect
-                options={[
-                  "Select Category",
-                  "Coffee",
-                  "Non-Coffee",
-                  "Snack",
-                ]}
+                options={["Select Category", "Coffee", "Non-Coffee", "Snack"]}
                 value={newMenu.category}
                 onChange={(e) =>
-                  setNewMenu({
-                    ...newMenu,
-                    category: e.target.value,
-                  })
+                  setNewMenu({ ...newMenu, category: e.target.value })
                 }
               />
 
@@ -208,10 +211,7 @@ export default function Menu() {
                 placeholder="Price"
                 value={newMenu.price || ""}
                 onChange={(e) =>
-                  setNewMenu({
-                    ...newMenu,
-                    price: Number(e.target.value),
-                  })
+                  setNewMenu({ ...newMenu, price: Number(e.target.value) })
                 }
               />
 
@@ -220,23 +220,16 @@ export default function Menu() {
                 placeholder="Stock"
                 value={newMenu.stock || ""}
                 onChange={(e) =>
-                  setNewMenu({
-                    ...newMenu,
-                    stock: Number(e.target.value),
-                  })
+                  setNewMenu({ ...newMenu, stock: Number(e.target.value) })
                 }
               />
 
-              {/* Form Input Image URL opsional tetap ada seandainya database butuh, bisa kamu hapus jika benar-benar tidak dipakai lagi */}
               <Input
                 className="md:col-span-2"
                 placeholder="Image URL (Optional)"
                 value={newMenu.image}
                 onChange={(e) =>
-                  setNewMenu({
-                    ...newMenu,
-                    image: e.target.value,
-                  })
+                  setNewMenu({ ...newMenu, image: e.target.value })
                 }
               />
             </div>
@@ -246,8 +239,8 @@ export default function Menu() {
                 {editing ? "Update Menu" : "Submit"}
               </Button>
               {editing && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setEditing(null);
                     setShowForm(false);
@@ -271,18 +264,11 @@ export default function Menu() {
           />
 
           <FilterSelect
-            options={[
-              "All Categories",
-              "Coffee",
-              "Non-Coffee",
-              "Snack",
-            ]}
+            options={["All Categories", "Coffee", "Non-Coffee", "Snack"]}
             className="w-[220px]"
             onChange={(e) =>
               setFilter(
-                e.target.value === "All Categories"
-                  ? ""
-                  : e.target.value
+                e.target.value === "All Categories" ? "" : e.target.value
               )
             }
           />
@@ -306,8 +292,8 @@ export default function Menu() {
           ) : (
             <Table headers={tableHeaders}>
               {filtered.map((m) => (
-                <tr 
-                  key={m.menuId} 
+                <tr
+                  key={m.menuId}
                   className="border-b border-[#F1DFC8]/40 hover:bg-[#FDFBF7] transition-colors"
                 >
                   {/* Nama Menu */}
@@ -343,7 +329,7 @@ export default function Menu() {
                   {/* Tombol Aksi */}
                   <td className="py-4 text-sm">
                     <div className="flex items-center gap-2">
-                      {/* BUTTON EDIT (PENCIL) */}
+                      {/* BUTTON EDIT */}
                       <button
                         type="button"
                         onClick={() => editMenu(m)}
@@ -353,7 +339,7 @@ export default function Menu() {
                         <Pencil className="size-4" />
                       </button>
 
-                      {/* BUTTON DELETE (TRASH) */}
+                      {/* BUTTON DELETE */}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <button
@@ -370,7 +356,9 @@ export default function Menu() {
                             <AlertDialogTitle>Delete Menu?</AlertDialogTitle>
                           </AlertDialogHeader>
                           <p className="text-sm text-gray-600">
-                            Are you sure you want to delete <strong>{m.name}</strong> from the menu list? This action cannot be undone.
+                            Are you sure you want to delete{" "}
+                            <strong>{m.name}</strong> from the menu list? This
+                            action cannot be undone.
                           </p>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>

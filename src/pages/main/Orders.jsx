@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -11,9 +11,9 @@ import {
   Ticket,
 } from "lucide-react";
 
-import ordersData from "../../data/orders.json";
-import customers from "../../data/customers.json";
-import menuData from "../../data/menu.json";
+import { ordersAPI } from "../../services/ordersAPI";
+import { customersAPI } from "../../services/customersAPI";
+import { menuAPI } from "../../services/menuAPI";
 
 import PageHeader from "../../components/PageHeader";
 import Button from "../../components/Button";
@@ -25,20 +25,10 @@ import FilterSelect from "../../components/FilterSelect";
 import Table from "../../components/Table";
 
 export default function Orders() {
-  const [orders, setOrders] = useState(
-    ordersData.map((o) => ({
-      ...o,
-      total:
-        o.total ??
-        o.items.reduce(
-          (sum, item) =>
-            sum +
-            Number(item.qty || 0) *
-            Number(item.price || 0),
-          0
-        ),
-    }))
-  );
+  const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [menuData, setMenuData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [showForm, setShowForm] = useState(false);
   const [cart, setCart] = useState([]);
@@ -48,9 +38,7 @@ export default function Orders() {
   const [category, setCategory] = useState("All");
 
   const [customerType, setCustomerType] = useState("Member");
-  const [selectedCustomer, setSelectedCustomer] = useState(
-    customers[0]?.customerName || ""
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState("");
   const [guestName, setGuestName] = useState("");
   const [orderType, setOrderType] = useState("Dine In");
   const [notes, setNotes] = useState("");
@@ -59,6 +47,44 @@ export default function Orders() {
   const [voucherCode, setVoucherCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedVoucher, setAppliedVoucher] = useState("");
+
+  useEffect(() => {
+    loadAll();
+  }, []);
+
+  const loadAll = async () => {
+    try {
+      setLoading(true);
+      const [ordersRes, customersRes, menuRes] = await Promise.all([
+        ordersAPI.fetchData(),
+        customersAPI.fetchData(),
+        menuAPI.fetchData(),
+      ]);
+
+      // Pastikan setiap order punya field total
+      const normalizedOrders = ordersRes.map((o) => ({
+        ...o,
+        total:
+          o.total ??
+          o.items.reduce(
+            (sum, item) =>
+              sum + Number(item.qty || 0) * Number(item.price || 0),
+            0
+          ),
+      }));
+
+      setOrders(normalizedOrders);
+      setCustomers(customersRes);
+      setMenuData(menuRes);
+      if (customersRes.length > 0) {
+        setSelectedCustomer(customersRes[0].customerName);
+      }
+    } catch (err) {
+      console.error("Gagal memuat data orders:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // VALIDASI VOUCHER
   const handleApplyVoucher = () => {
@@ -99,11 +125,7 @@ export default function Orders() {
     } else {
       setCart([
         ...cart,
-        {
-          name: item.name,
-          qty: 1,
-          price: Number(item.price),
-        },
+        { name: item.name, qty: 1, price: Number(item.price) },
       ]);
     }
   };
@@ -114,10 +136,7 @@ export default function Orders() {
       cart
         .map((c) => {
           if (c.name === name) {
-            return {
-              ...c,
-              qty: type === "inc" ? c.qty + 1 : c.qty - 1,
-            };
+            return { ...c, qty: type === "inc" ? c.qty + 1 : c.qty - 1 };
           }
           return c;
         })
@@ -138,13 +157,14 @@ export default function Orders() {
   const finalTotal = Math.max(0, subTotal - discountAmount);
 
   // SUBMIT TRANSAKSI
-  const handleSubmit = (paymentMethod) => {
+  const handleSubmit = async (paymentMethod) => {
     if (cart.length === 0) {
       alert("Pilih menu terlebih dahulu!");
       return;
     }
 
-    const customerName = customerType === "Member" ? selectedCustomer : guestName;
+    const customerName =
+      customerType === "Member" ? selectedCustomer : guestName;
     if (!customerName) {
       alert("Nama pelanggan harus diisi!");
       return;
@@ -161,7 +181,10 @@ export default function Orders() {
       })),
       paymentMethod,
       orderType,
-      tableNumber: orderType === "Dine In" ? Math.floor(Math.random() * 20) + 1 : 0,
+      tableNumber:
+        orderType === "Dine In"
+          ? Math.floor(Math.random() * 20) + 1
+          : 0,
       barista: "Admin",
       status: "Completed",
       date: new Date().toISOString().slice(0, 10),
@@ -171,7 +194,12 @@ export default function Orders() {
       total: Number(finalTotal),
     };
 
-    setOrders((prev) => [newOrder, ...prev]);
+    try {
+      const created = await ordersAPI.createData(newOrder);
+      setOrders((prev) => [created, ...prev]);
+    } catch (err) {
+      console.error("Gagal menyimpan order:", err);
+    }
 
     // RESET FORM
     setCart([]);
@@ -188,6 +216,14 @@ export default function Orders() {
   const filteredOrders = orders.filter((o) =>
     o.customer.toLowerCase().includes(searchOrder.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#F8F4EE] flex items-center justify-center">
+        <p className="text-gray-400 text-sm animate-pulse">Memuat data orders...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 min-h-screen bg-[#F8F4EE] overflow-x-hidden">
@@ -272,7 +308,10 @@ export default function Orders() {
               ) : (
                 <div className="space-y-4">
                   {cart.map((c) => (
-                    <div key={c.name} className="border border-[#F5E7D4] rounded-2xl p-4 bg-[#FFF7ED] flex justify-between items-center">
+                    <div
+                      key={c.name}
+                      className="border border-[#F5E7D4] rounded-2xl p-4 bg-[#FFF7ED] flex justify-between items-center"
+                    >
                       <div>
                         <h3 className="font-semibold text-[#5B2E0F]">{c.name}</h3>
                         <p className="text-sm text-[#A16207] mt-1">
@@ -284,15 +323,29 @@ export default function Orders() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" className="w-9 h-9 px-0 border-[#D46300] text-[#D46300]" onClick={() => changeQty(c.name, "dec")}>
+                          <Button
+                            variant="outline"
+                            className="w-9 h-9 px-0 border-[#D46300] text-[#D46300]"
+                            onClick={() => changeQty(c.name, "dec")}
+                          >
                             <Minus className="size-4" />
                           </Button>
-                          <span className="font-semibold min-w-[24px] text-center text-[#5B2E0F]">{c.qty}</span>
-                          <Button variant="outline" className="w-9 h-9 px-0 border-[#D46300] text-[#D46300]" onClick={() => changeQty(c.name, "inc")}>
+                          <span className="font-semibold min-w-[24px] text-center text-[#5B2E0F]">
+                            {c.qty}
+                          </span>
+                          <Button
+                            variant="outline"
+                            className="w-9 h-9 px-0 border-[#D46300] text-[#D46300]"
+                            onClick={() => changeQty(c.name, "inc")}
+                          >
                             <Plus className="size-4" />
                           </Button>
                         </div>
-                        <Button variant="danger" className="w-10 h-10 px-0 bg-red-500 text-white hover:bg-red-600" onClick={() => removeItem(c.name)}>
+                        <Button
+                          variant="danger"
+                          className="w-10 h-10 px-0 bg-red-500 text-white hover:bg-red-600"
+                          onClick={() => removeItem(c.name)}
+                        >
                           <Trash2 className="size-4" />
                         </Button>
                       </div>
@@ -314,11 +367,14 @@ export default function Orders() {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value)}
                 />
-                <Button type="button" onClick={handleApplyVoucher}>Apply</Button>
+                <Button type="button" onClick={handleApplyVoucher}>
+                  Apply
+                </Button>
               </div>
               {appliedVoucher && (
                 <p className="text-sm text-green-600 font-medium">
-                  ✓ Voucher <strong>{appliedVoucher}</strong> aktif (-Rp {discountAmount.toLocaleString("id-ID")})
+                  ✓ Voucher <strong>{appliedVoucher}</strong> aktif (-Rp{" "}
+                  {discountAmount.toLocaleString("id-ID")})
                 </p>
               )}
             </div>
@@ -392,9 +448,14 @@ export default function Orders() {
           </div>
 
           <div className="overflow-x-auto">
-            <Table headers={["Pelanggan", "Item Menu", "Metode", "Status", "Total", "Aksi"]}>
+            <Table
+              headers={["Pelanggan", "Item Menu", "Metode", "Status", "Total", "Aksi"]}
+            >
               {filteredOrders.map((o) => (
-                <tr key={o.orderId} className="border-t border-[#F5E7D4] hover:bg-[#FFFBF6] transition-all">
+                <tr
+                  key={o.orderId}
+                  className="border-t border-[#F5E7D4] hover:bg-[#FFFBF6] transition-all"
+                >
                   <td className="p-5">
                     <p className="font-semibold text-[#5B2E0F]">{o.customer}</p>
                     <p className="text-sm text-[#A16207] mt-1">{o.date}</p>
@@ -402,14 +463,21 @@ export default function Orders() {
                   <td className="p-5 text-sm text-[#6B4F3A]">
                     {o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}
                   </td>
-                  <td className="p-5 text-center text-[#5B2E0F] font-medium">{o.paymentMethod}</td>
-                  <td className="p-5 text-center"><Badge color="green">{o.status}</Badge></td>
+                  <td className="p-5 text-center text-[#5B2E0F] font-medium">
+                    {o.paymentMethod}
+                  </td>
+                  <td className="p-5 text-center">
+                    <Badge color="green">{o.status}</Badge>
+                  </td>
                   <td className="p-5 text-right font-semibold text-[#5B2E0F]">
                     Rp {Number(o.total).toLocaleString("id-ID")}
                   </td>
                   <td className="p-5 text-center">
-                    <Link to={`/orders/${o.orderId}`}>
-                      <Button variant="outline" className="h-[40px] border-[#D46300] text-[#D46300] hover:bg-[#FFF7ED]">
+                    <Link to={`/admin/orders/${o.orderId}`}>
+                      <Button
+                        variant="outline"
+                        className="h-[40px] border-[#D46300] text-[#D46300] hover:bg-[#FFF7ED]"
+                      >
                         Detail
                       </Button>
                     </Link>
