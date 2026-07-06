@@ -1,404 +1,276 @@
-import Sidebar from "../../components/Sidebar";
-import Header from "../../components/Header";
-import PageHeader from "../../components/PageHeader";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Mail, KeyRound, AlertCircle, Loader2, Coffee, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
-import Button from "../../components/Button";
-import Input from "../../components/Input";
-import Badge from "../../components/Badge";
-import Card from "../../components/Card";
-import DashboardCard from "../../components/DashboardCard";
-import MenuCard from "../../components/MenuCard";
-import InventoryCard from "../../components/InventoryCard";
-import CustomerCard from "../../components/CustomerCard";
-import OrderCard from "../../components/OrderCard";
-import ActivityTable from "../../components/ActivityTable";
-import Table from "../../components/Table";
-import Modal from "../../components/Modal";
-import Loading from "../../components/Loading";
-import AuthCard from "../../components/AuthCard";
+import { usersAPI } from "../../services/usersAPI";
 import AuthInput from "../../components/AuthInput";
-import ChartCard from "../../components/ChartCard";
-import FilterSelect from "../../components/FilterSelect";
-import SearchBar from "../../components/SearchBar";
-import Footer from "../../components/Footer";
+import Button from "../../components/Button";
 
-import {
-  DollarSign,
-  ShoppingBag,
-  Coffee,
-  Users,
-  Trash2,
-  CreditCard,
-  QrCode,
-  Banknote,
-} from "lucide-react";
+export default function Forgot() {
+  // step: "email" | "reset" | "done"
+  const [step, setStep] = useState("email");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-export default function ComponentsPreview() {
+  const [email, setEmail] = useState("");
+  const [foundUser, setFoundUser] = useState(null);
 
-  const menu = {
-    name: "Caramel Latte",
-    category: "Coffee",
-    price: 32000,
-    stock: 20,
-    image:
-      "https://images.unsplash.com/photo-1517701604599-bb29b565090c",
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // ── STEP 1 — cari akun berdasarkan email ─────────────────
+  const handleCheckEmail = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const users = await usersAPI.fetchUsers();
+      const user = users.find(
+        (u) => u.email?.toLowerCase() === email.trim().toLowerCase()
+      );
+      if (!user) {
+        setError("Email tidak ditemukan. Pastikan email terdaftar di El-Coffee.");
+        return;
+      }
+      setFoundUser(user);
+      setStep("reset");
+    } catch {
+      setError("Gagal terhubung ke server. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const inventory = {
-    name: "Arabica Beans",
-    stock: 15,
-    category: "Beans",
-  };
+  // ── STEP 2 — simpan password baru ────────────────────────
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  const customer = {
-    name: "Andi Saputra",
-    email: "andi@example.com",
-    member: "Gold",
-  };
+    if (newPassword.length < 6) {
+      setError("Password minimal 6 karakter.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("Konfirmasi password tidak cocok.");
+      return;
+    }
 
-  const order = {
-    customer: "Budi",
-    total: 54000,
-    payment: "QRIS",
+    setLoading(true);
+    try {
+      await usersAPI.updateUser(foundUser.id, { password: newPassword });
+      setStep("done");
+    } catch {
+      setError("Gagal menyimpan password baru. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const activity = [
-    {
-      action: "New Order",
-      name: "Caramel Latte",
-      amount: "Rp 32.000",
-      status: "Completed",
-    },
-    {
-      action: "Restock",
-      name: "Arabica Beans",
-      amount: "15 pcs",
-      status: "Pending",
-    },
-  ];
 
   return (
-    <div className="min-h-screen bg-[#F8F4EE]">
+    <div className="fixed inset-0 w-screen h-screen bg-[#FAF7F2] flex items-center justify-center p-4 overflow-hidden font-sans z-[9999]">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#EEDFCE]/40 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-      <Header />
+      <div className="w-full max-w-[420px] bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl shadow-amber-900/5 z-50">
 
-      <div className="p-6 space-y-8">
-
-        <PageHeader
-          title="Components Preview"
-          breadcrumb="Preview all reusable components"
-        />
-
-        {/* BUTTONS */}
-        <Card>
-
-          <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-            Buttons
-          </h2>
-
-          <div className="flex flex-wrap gap-4">
-
-            <Button>
-              Primary
-            </Button>
-
-            <Button variant="secondary">
-              Secondary
-            </Button>
-
-            <Button variant="outline">
-              Outline
-            </Button>
-
-            <Button variant="ghost">
-              Ghost
-            </Button>
-
-            <Button variant="danger">
-              <Trash2 className="size-4" />
-              Delete
-            </Button>
-
-            <Button variant="debit">
-              <CreditCard className="size-4" />
-              Debit
-            </Button>
-
-            <Button variant="qris">
-              <QrCode className="size-4" />
-              QRIS
-            </Button>
-
-            <Button variant="cash">
-              <Banknote className="size-4" />
-              Cash
-            </Button>
-
+        {/* BRANDING */}
+        <div className="flex flex-col items-center justify-center text-center mb-8">
+          <div className="w-12 h-12 bg-[#3D2517] rounded-2xl flex items-center justify-center shadow-md text-[#EEDFCE] mb-3">
+            <Coffee className="size-6" />
           </div>
-
-        </Card>
-
-        {/* INPUT */}
-        <Card>
-
-          <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-            Inputs
+          <h2 className="text-3xl font-serif font-bold text-[#3D2517] tracking-wide">
+            El-Coffee
           </h2>
-
-          <div className="grid md:grid-cols-2 gap-4">
-
-            <Input placeholder="Input component..." />
-
-            <SearchBar placeholder="Search component..." />
-
-            <FilterSelect
-              options={[
-                "Coffee",
-                "Non-Coffee",
-                "Snack",
-              ]}
-            />
-
-            <AuthInput
-              label="Email"
-              placeholder="you@example.com"
-            />
-
-          </div>
-
-        </Card>
-
-        {/* BADGES */}
-        <Card>
-
-          <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-            Badges
-          </h2>
-
-          <div className="flex flex-wrap gap-4">
-
-            <Badge color="green">
-              Completed
-            </Badge>
-
-            <Badge color="yellow">
-              Pending
-            </Badge>
-
-            <Badge color="red">
-              Cancelled
-            </Badge>
-
-            <Badge color="blue">
-              Processing
-            </Badge>
-
-            <Badge color="gold">
-              Gold Member
-            </Badge>
-
-            <Badge color="silver">
-              Silver Member
-            </Badge>
-
-            <Badge color="bronze">
-              Bronze Member
-            </Badge>
-
-          </div>
-
-        </Card>
-
-        {/* DASHBOARD CARDS */}
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
-
-          <DashboardCard
-            title="Revenue"
-            value="Rp 12.500.000"
-            icon={<DollarSign className="size-6" />}
-          />
-
-          <DashboardCard
-            title="Orders"
-            value="120 Orders"
-            icon={<ShoppingBag className="size-6" />}
-          />
-
-          <DashboardCard
-            title="Menu"
-            value="48 Products"
-            icon={<Coffee className="size-6" />}
-          />
-
-          <DashboardCard
-            title="Customers"
-            value="320 Users"
-            icon={<Users className="size-6" />}
-          />
-
+          <p className="text-[10px] text-gray-400 font-semibold mt-1.5 uppercase tracking-widest">
+            {step === "email" && "Reset Your Password"}
+            {step === "reset" && "Set New Password"}
+            {step === "done"  && "Password Updated"}
+          </p>
         </div>
 
-        {/* CARD COMPONENTS */}
-        <div className="grid lg:grid-cols-2 xl:grid-cols-4 gap-5">
-
-          <MenuCard menu={menu} />
-
-          <InventoryCard item={inventory} />
-
-          <CustomerCard customer={customer} />
-
-          <OrderCard order={order} />
-
-        </div>
-
-        {/* TABLE */}
-        <Card className="overflow-hidden p-0">
-
-          <div className="p-6 border-b border-[#F5E7D4]">
-
-            <h2 className="text-[22px] font-semibold text-[#5B2E0F]">
-              Table Component
-            </h2>
-
+        {/* ERROR */}
+        {error && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200/50 text-red-700 rounded-xl px-4 py-3 mb-5 text-xs font-medium">
+            <AlertCircle className="size-4 shrink-0" />
+            <p>{error}</p>
           </div>
-
-          <div className="overflow-x-auto">
-
-            <Table
-              headers={[
-                "Customer",
-                "Payment",
-                "Status",
-                "Total",
-              ]}
-            >
-
-              <tr className="border-t border-[#F5E7D4]">
-
-                <td className="p-5">
-                  Andi Saputra
-                </td>
-
-                <td className="p-5">
-                  QRIS
-                </td>
-
-                <td className="p-5">
-
-                  <Badge color="green">
-                    Completed
-                  </Badge>
-
-                </td>
-
-                <td className="p-5 font-semibold">
-                  Rp 54.000
-                </td>
-
-              </tr>
-
-              <tr className="border-t border-[#F5E7D4]">
-
-                <td className="p-5">
-                  Budi Santoso
-                </td>
-
-                <td className="p-5">
-                  Cash
-                </td>
-
-                <td className="p-5">
-
-                  <Badge color="yellow">
-                    Pending
-                  </Badge>
-
-                </td>
-
-                <td className="p-5 font-semibold">
-                  Rp 32.000
-                </td>
-
-              </tr>
-
-            </Table>
-
-          </div>
-
-        </Card>
-
-        {/* ACTIVITY TABLE */}
-        <Card>
-
-          <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-            Activity Table
-          </h2>
-
-          <ActivityTable data={activity} />
-
-        </Card>
-
-        {/* CHART */}
-        <ChartCard />
-
-        {/* AUTH CARD */}
-        <div className="max-w-[450px]">
-
-          <AuthCard>
-
-            <h2 className="text-[24px] font-semibold text-[#5B2E0F] mb-5">
-              Auth Card
-            </h2>
-
-            <div className="space-y-4">
-
-              <AuthInput
-                label="Email"
-                placeholder="you@example.com"
-              />
-
-              <AuthInput
-                label="Password"
-                type="password"
-                placeholder="********"
-              />
-
-              <Button className="w-full">
-                Login
-              </Button>
-
-            </div>
-
-          </AuthCard>
-
-        </div>
+        )}
 
         {/* LOADING */}
-        <Card>
+        {loading && (
+          <div className="flex items-center gap-3 bg-[#FFF7ED] border border-[#F4E1C8]/60 text-[#A16207] rounded-xl px-4 py-3 mb-5 text-xs font-medium">
+            <Loader2 className="size-4 animate-spin shrink-0" />
+            Memproses permintaan...
+          </div>
+        )}
 
-          <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-            Loading Component
-          </h2>
+        {/* ── STEP 1: cek email ───────────────────────────── */}
+        {step === "email" && (
+          <form onSubmit={handleCheckEmail} className="space-y-4">
+            <p className="text-xs text-gray-500 leading-relaxed -mt-2 mb-4">
+              Masukkan email akun El-Coffee Anda. Kami akan memverifikasi akunnya dan mempersilakan Anda mengatur password baru.
+            </p>
 
-          <Loading />
+            <AuthInput
+              icon={<Mail className="size-4 text-gray-400" />}
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-        </Card>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm tracking-wide"
+              >
+                {loading ? "Mencari Akun..." : "Cari Akun"}
+              </Button>
+            </div>
+          </form>
+        )}
 
-        {/* MODAL */}
-        <Card>
+        {/* ── STEP 2: set password baru ───────────────────── */}
+        {step === "reset" && (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            {/* Info akun ditemukan */}
+            <div className="flex items-center gap-3 bg-green-50 border border-green-200/50 text-green-700 rounded-xl px-4 py-3 text-xs font-medium -mt-2 mb-2">
+              <CheckCircle2 className="size-4 shrink-0" />
+              <div>
+                <p className="font-bold">Akun ditemukan!</p>
+                <p className="opacity-80 mt-0.5">
+                  {foundUser?.username} · {foundUser?.email}
+                </p>
+              </div>
+            </div>
 
-          <h2 className="text-[22px] font-semibold text-[#5B2E0F] mb-5">
-            Modal Preview
-          </h2>
+            {/* New Password */}
+            <div className="relative">
+              <AuthInput
+                icon={<KeyRound className="size-4 text-gray-400" />}
+                type={showNew ? "text" : "password"}
+                placeholder="Password Baru"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showNew ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
 
-          <Modal />
+            {/* Confirm Password */}
+            <div className="relative">
+              <AuthInput
+                icon={<KeyRound className="size-4 text-gray-400" />}
+                type={showConfirm ? "text" : "password"}
+                placeholder="Konfirmasi Password Baru"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
 
-        </Card>
+            {/* Password strength hint */}
+            {newPassword.length > 0 && (
+              <div className="flex gap-1.5 items-center">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 flex-1 rounded-full transition-all ${
+                      newPassword.length >= i * 3
+                        ? newPassword.length < 6
+                          ? "bg-red-400"
+                          : newPassword.length < 9
+                          ? "bg-amber-400"
+                          : "bg-green-500"
+                        : "bg-gray-200"
+                    }`}
+                  />
+                ))}
+                <span className={`text-[10px] font-semibold ml-1 ${
+                  newPassword.length < 6 ? "text-red-500"
+                  : newPassword.length < 9 ? "text-amber-500"
+                  : "text-green-600"
+                }`}>
+                  {newPassword.length < 6 ? "Lemah" : newPassword.length < 9 ? "Sedang" : "Kuat"}
+                </span>
+              </div>
+            )}
+
+            <div className="pt-2 flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { setStep("email"); setError(""); setFoundUser(null); setNewPassword(""); setConfirmPassword(""); }}
+                className="flex-1"
+              >
+                Kembali
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-[#D97706] hover:bg-[#B45309] text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm tracking-wide"
+              >
+                {loading ? "Menyimpan..." : "Simpan Password"}
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {/* ── STEP 3: done ────────────────────────────────── */}
+        {step === "done" && (
+          <div className="text-center space-y-5">
+            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto border border-green-200">
+              <CheckCircle2 className="size-8 text-green-500" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#3D2517] text-base">Password berhasil diperbarui!</h3>
+              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                Password akun <span className="font-semibold text-[#D97706]">{foundUser?.email}</span> sudah diperbarui. Silakan login dengan password baru Anda.
+              </p>
+            </div>
+            <Link to="/login">
+              <Button className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm tracking-wide">
+                Kembali ke Login
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        {/* BACK TO LOGIN link (step 1 & 2) */}
+        {step !== "done" && (
+          <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+            <p className="text-xs text-gray-400 font-medium">
+              Sudah ingat password?{" "}
+              <Link
+                to="/login"
+                className="text-[#D97706] font-bold hover:text-[#B45309] transition-colors ml-1 hover:underline"
+              >
+                Kembali Login
+              </Link>
+            </p>
+          </div>
+        )}
 
       </div>
-
-      <Footer />
-
     </div>
   );
 }
